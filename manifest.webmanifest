@@ -1,0 +1,19 @@
+{
+  "name": "Vesuvio — emulatore DS e GBA",
+  "short_name": "Vesuvio",
+  "description": "Nintendo DS, Game Boy Advance e Game Boy nel browser, con salvataggi sicuri e controlli touch.",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f1220",
+  "theme_color": "#0f1220",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vesuvio">
+<title>Vesuvio · Gioco</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="stylesheet" href="css/app.css">
+<script>try{var s=JSON.parse(localStorage.getItem("vesuvio.settings")||"null");if(s&&s.theme)document.documentElement.dataset.theme=s.theme}catch(e){}</script>
+</head>
+<body class="play-page">
+<div id="game" class="game-root" data-orient="portrait" data-view="both">
+  <header class="game-bar" id="bar">
+    <button class="icon-btn" id="btn-menu" aria-label="Menu"></button>
+    <div class="game-title" id="title"></div>
+    <div class="speed-chip" id="speed" hidden></div>
+    <button class="icon-btn" id="btn-view" aria-label="Schermi"></button>
+    <button class="icon-btn turbo-btn" id="btn-turbo" aria-label="Turbo"><span class="turbo-x"></span></button>
+    <button class="icon-btn" id="btn-save" aria-label="Salva ora"></button>
+    <button class="icon-btn" id="btn-pause" aria-label="Pausa"></button>
+  </header>
+  <main class="stage" id="stage">
+    <div class="screens" id="screens"><canvas id="canvas" tabindex="-1"></canvas></div>
+  </main>
+  <div id="pad"></div>
+  <div class="freeze-banner" id="freeze" hidden></div>
+  <div class="overlay" id="overlay">
+    <div class="overlay-card" id="overlay-card">
+      <div class="spinner"></div>
+      <p id="overlay-text">Carico…</p>
+    </div>
+  </div>
+</div>
+<script type="module" src="js/play.js"></script>
+</body>
+</html>

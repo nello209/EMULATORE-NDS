@@ -1,0 +1,54 @@
+// Screenshot dell'app con le ROM di test (per documentazione e controllo visivo).
+// Uso: node tools/screenshots.mjs <cartella-di-uscita>
+import { launch, addRom, gameIds, startGame, ROM, GBA_ROM } from "../tests/e2e/helpers.mjs";
+const out = (process.argv[2] || "docs/img").replace(/\/$/, "") + "/";
+const t = await launch({ viewport: { width: 390, height: 844 } });
+const { page, base } = t;
+const shot = (n) => page.screenshot({ path: out + n + ".png" });
+await page.goto(base);
+await page.waitForFunction(() => window.vesuvioHome?.ready);
+await page.evaluate(async () => { const s = await import("./js/settings.js"); await s.saveSettings({ autosave: { intervalSec: 3, warmupSec: 2 } }); });
+await shot("01-libreria-vuota");
+await addRom(page, ROM);
+await page.keyboard.press("Escape");
+await page.click(".sheet-wrap.open .sheet-head button");
+await addRom(page, GBA_ROM);
+await page.click(".sheet-wrap.open .sheet-head button");
+const ids = await gameIds(page);
+const nds = (await page.evaluate(async () => (await window.vesuvioHome.store.listGames()).map((g) => [g.id, g.system]))).find((g) => g[1] === "nds")[0];
+await startGame(page, base, nds);
+for (let i = 0; i < 6; i++) {
+  await page.evaluate(() => window.vesuvio.session.noteInput());
+  await page.waitForTimeout(2000);
+}
+await page.click("#btn-save");
+await page.waitForTimeout(1500);
+await shot("02-gioco-verticale");
+await page.click("#btn-menu");
+await page.waitForTimeout(500);
+await shot("03-menu");
+await page.click(".menu-btn:has-text('Carica stato')");
+await page.waitForTimeout(800);
+await shot("04-stati");
+await page.goto(base);
+await page.waitForFunction(() => window.vesuvioHome?.ready);
+await page.waitForTimeout(500);
+await shot("05-libreria");
+await page.click(`.game-card[data-id="${nds}"] .game-open`);
+await page.waitForTimeout(800);
+await shot("06-scheda-gioco");
+await page.click(".sheet-wrap.open .sheet-head button");
+await page.waitForTimeout(300);
+await page.click("#btn-settings");
+await page.waitForTimeout(500);
+await shot("07-impostazioni");
+await page.setViewportSize({ width: 1180, height: 820 });
+await page.goto(base);
+await page.waitForFunction(() => window.vesuvioHome?.ready);
+await page.evaluate(async () => { const s = await import("./js/settings.js"); await s.saveSettings({ theme: "napoli" }); });
+await startGame(page, base, nds);
+await page.waitForTimeout(1500);
+await shot("08-ipad-orizzontale-napoli");
+await page.evaluate(async () => { const s = await import("./js/settings.js"); await s.saveSettings({ theme: "vesuvio" }); });
+console.log("errori:", t.errors);
+await t.close();

@@ -1,0 +1,28 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Installa Playwright e Chromium
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Rigenera le ROM di test e verifica che coincidano con quelle nel repository
+        run: |
+          python3 tools/make_test_rom.py
+          git diff --exit-code tests/fixtures
+      - name: Test unitari
+        run: npm test
+      - name: Test end-to-end (browser vero, core veri)
+        run: npm run test:e2e
