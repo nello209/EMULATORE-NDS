@@ -1,0 +1,982 @@
+{
+  "result": {
+    "core": "melonds",
+    "minutes": 30,
+    "emulatedFrames": 100906,
+    "emulatedMinutes": 28.1,
+    "firstQuarterRatio": 0.94,
+    "lastQuarterRatio": 0.94,
+    "heapStartMB": 10,
+    "heapEndMB": 14,
+    "heapMaxMB": 14,
+    "maxStates": 19,
+    "maxSaveMs": 457,
+    "storageEndMB": 6,
+    "freezes": 0,
+    "jsErrors": [],
+    "verdict": {
+      "speedStable": true,
+      "memoryBounded": true,
+      "statesBounded": true,
+      "noFreezes": true
+    }
+  },
+  "samples": [
+    {
+      "frame": 1792,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 2,
+      "kinds": {
+        "auto": 2
+      },
+      "saveMs": 399,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 0.5,
+      "fps": 59,
+      "ratio": 0.99
+    },
+    {
+      "frame": 3656,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 5,
+      "kinds": {
+        "auto": 5
+      },
+      "saveMs": 289,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 1,
+      "fps": 61.7,
+      "ratio": 1.03
+    },
+    {
+      "frame": 5419,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 8,
+      "kinds": {
+        "auto": 8
+      },
+      "saveMs": 340,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 1.5,
+      "fps": 58.3,
+      "ratio": 0.97
+    },
+    {
+      "frame": 7125,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 11,
+      "kinds": {
+        "auto": 11
+      },
+      "saveMs": 297,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 2,
+      "fps": 56.5,
+      "ratio": 0.94
+    },
+    {
+      "frame": 8798,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 13,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 1
+      },
+      "saveMs": 374,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 2.5,
+      "fps": 55.3,
+      "ratio": 0.92
+    },
+    {
+      "frame": 10491,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 13,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 1
+      },
+      "saveMs": 404,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 3,
+      "fps": 56,
+      "ratio": 0.94
+    },
+    {
+      "frame": 12179,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 13,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 1
+      },
+      "saveMs": 400,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 3.5,
+      "fps": 55.9,
+      "ratio": 0.93
+    },
+    {
+      "frame": 13895,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 13,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 1
+      },
+      "saveMs": 342,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 4,
+      "fps": 56.8,
+      "ratio": 0.95
+    },
+    {
+      "frame": 15546,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 14,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 2
+      },
+      "saveMs": 404,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 4.5,
+      "fps": 54.7,
+      "ratio": 0.91
+    },
+    {
+      "frame": 17254,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 14,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 2
+      },
+      "saveMs": 453,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 5,
+      "fps": 56.5,
+      "ratio": 0.94
+    },
+    {
+      "frame": 18973,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 14,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 2
+      },
+      "saveMs": 386,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 5.5,
+      "fps": 56.8,
+      "ratio": 0.95
+    },
+    {
+      "frame": 20630,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 14,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 2
+      },
+      "saveMs": 297,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 6,
+      "fps": 54.8,
+      "ratio": 0.92
+    },
+    {
+      "frame": 22279,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 15,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 3
+      },
+      "saveMs": 457,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 6.6,
+      "fps": 54.4,
+      "ratio": 0.91
+    },
+    {
+      "frame": 23908,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 15,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 3
+      },
+      "saveMs": 408,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 7.1,
+      "fps": 53.7,
+      "ratio": 0.9
+    },
+    {
+      "frame": 25585,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 15,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 3
+      },
+      "saveMs": 327,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 7.6,
+      "fps": 55.5,
+      "ratio": 0.93
+    },
+    {
+      "frame": 27221,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 15,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 3
+      },
+      "saveMs": 372,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 8.1,
+      "fps": 54.2,
+      "ratio": 0.91
+    },
+    {
+      "frame": 28862,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 16,
+      "kinds": {
+        "checkpoint": 4,
+        "auto": 12
+      },
+      "saveMs": 322,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 8.6,
+      "fps": 53.5,
+      "ratio": 0.89
+    },
+    {
+      "frame": 30535,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 16,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 4
+      },
+      "saveMs": 319,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 9.1,
+      "fps": 55.4,
+      "ratio": 0.93
+    },
+    {
+      "frame": 32171,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 16,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 4
+      },
+      "saveMs": 364,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 9.6,
+      "fps": 54,
+      "ratio": 0.9
+    },
+    {
+      "frame": 33889,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 16,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 4
+      },
+      "saveMs": 441,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 10.1,
+      "fps": 56.8,
+      "ratio": 0.95
+    },
+    {
+      "frame": 35571,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 17,
+      "kinds": {
+        "checkpoint": 5,
+        "auto": 12
+      },
+      "saveMs": 286,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 10.6,
+      "fps": 55.7,
+      "ratio": 0.93
+    },
+    {
+      "frame": 37114,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 17,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 5
+      },
+      "saveMs": 409,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 11.1,
+      "fps": 50.9,
+      "ratio": 0.85
+    },
+    {
+      "frame": 38762,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 13,
+        "checkpoint": 5
+      },
+      "saveMs": 407,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 11.6,
+      "fps": 54.3,
+      "ratio": 0.91
+    },
+    {
+      "frame": 40502,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 17,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 5
+      },
+      "saveMs": 366,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 12.1,
+      "fps": 57.5,
+      "ratio": 0.96
+    },
+    {
+      "frame": 42200,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 17,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 5
+      },
+      "saveMs": 346,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 12.6,
+      "fps": 56.2,
+      "ratio": 0.94
+    },
+    {
+      "frame": 43830,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 334,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 13.1,
+      "fps": 53.9,
+      "ratio": 0.9
+    },
+    {
+      "frame": 45442,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 409,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 13.6,
+      "fps": 53.3,
+      "ratio": 0.89
+    },
+    {
+      "frame": 47057,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 407,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 14.1,
+      "fps": 53.4,
+      "ratio": 0.89
+    },
+    {
+      "frame": 48702,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 407,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 14.6,
+      "fps": 54.4,
+      "ratio": 0.91
+    },
+    {
+      "frame": 50257,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 449,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 15.1,
+      "fps": 51.4,
+      "ratio": 0.86
+    },
+    {
+      "frame": 51808,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 347,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 15.6,
+      "fps": 51.3,
+      "ratio": 0.86
+    },
+    {
+      "frame": 53440,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 368,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 16.1,
+      "fps": 54,
+      "ratio": 0.9
+    },
+    {
+      "frame": 55100,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 340,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 16.6,
+      "fps": 55,
+      "ratio": 0.92
+    },
+    {
+      "frame": 56669,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 419,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 17.1,
+      "fps": 51.9,
+      "ratio": 0.87
+    },
+    {
+      "frame": 58292,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 357,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 17.6,
+      "fps": 53.7,
+      "ratio": 0.9
+    },
+    {
+      "frame": 59968,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 384,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 18.2,
+      "fps": 55.5,
+      "ratio": 0.93
+    },
+    {
+      "frame": 61696,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 450,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 18.7,
+      "fps": 57.2,
+      "ratio": 0.96
+    },
+    {
+      "frame": 63375,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "checkpoint": 6,
+        "auto": 12
+      },
+      "saveMs": 331,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 19.2,
+      "fps": 55.6,
+      "ratio": 0.93
+    },
+    {
+      "frame": 65143,
+      "heapMB": 10,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 287,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 19.7,
+      "fps": 58.5,
+      "ratio": 0.98
+    },
+    {
+      "frame": 66904,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 347,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 20.2,
+      "fps": 58.2,
+      "ratio": 0.97
+    },
+    {
+      "frame": 68563,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 366,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 20.7,
+      "fps": 54.9,
+      "ratio": 0.92
+    },
+    {
+      "frame": 70258,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "checkpoint": 6,
+        "auto": 12
+      },
+      "saveMs": 385,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 21.2,
+      "fps": 56.2,
+      "ratio": 0.94
+    },
+    {
+      "frame": 72005,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 391,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 21.7,
+      "fps": 57.8,
+      "ratio": 0.97
+    },
+    {
+      "frame": 73786,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 351,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 22.2,
+      "fps": 58.9,
+      "ratio": 0.98
+    },
+    {
+      "frame": 75506,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 381,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 22.7,
+      "fps": 56.9,
+      "ratio": 0.95
+    },
+    {
+      "frame": 77219,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 389,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 23.2,
+      "fps": 56.8,
+      "ratio": 0.95
+    },
+    {
+      "frame": 78877,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 399,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 23.7,
+      "fps": 54.8,
+      "ratio": 0.92
+    },
+    {
+      "frame": 80545,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 337,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 24.2,
+      "fps": 55.1,
+      "ratio": 0.92
+    },
+    {
+      "frame": 82165,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 372,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 24.7,
+      "fps": 53.5,
+      "ratio": 0.89
+    },
+    {
+      "frame": 83841,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 382,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 25.2,
+      "fps": 55.4,
+      "ratio": 0.93
+    },
+    {
+      "frame": 85644,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 383,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 25.7,
+      "fps": 59.6,
+      "ratio": 1
+    },
+    {
+      "frame": 87433,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 400,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 26.2,
+      "fps": 59.2,
+      "ratio": 0.99
+    },
+    {
+      "frame": 89169,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 19,
+      "kinds": {
+        "auto": 13,
+        "checkpoint": 6
+      },
+      "saveMs": 349,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 26.7,
+      "fps": 57.2,
+      "ratio": 0.96
+    },
+    {
+      "frame": 90848,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 367,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 27.2,
+      "fps": 55.6,
+      "ratio": 0.93
+    },
+    {
+      "frame": 92442,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 362,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 27.7,
+      "fps": 52.7,
+      "ratio": 0.88
+    },
+    {
+      "frame": 94157,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 346,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 28.2,
+      "fps": 56.7,
+      "ratio": 0.95
+    },
+    {
+      "frame": 95904,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 428,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 28.7,
+      "fps": 57.8,
+      "ratio": 0.97
+    },
+    {
+      "frame": 97656,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 365,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 29.2,
+      "fps": 58,
+      "ratio": 0.97
+    },
+    {
+      "frame": 99300,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 400,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 29.7,
+      "fps": 54.3,
+      "ratio": 0.91
+    },
+    {
+      "frame": 100906,
+      "heapMB": 14,
+      "wasmMB": 128,
+      "states": 18,
+      "kinds": {
+        "auto": 12,
+        "checkpoint": 6
+      },
+      "saveMs": 366,
+      "storageMB": 6,
+      "frozen": null,
+      "min": 30.2,
+      "fps": 53.2,
+      "ratio": 0.89
+    }
+  ]
+}

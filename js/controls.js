@@ -1,18 +1,27 @@
 // Controlli touch, tastiera e gamepad.
 //
-// Croce direzionale "scorrevole": un'unica area; la direzione dipende da dove
-// si trova il dito rispetto al centro, quindi si puo' trascinare senza alzarlo.
-// Le diagonali hanno settori stretti (30°) per evitare passi storti nei giochi
-// a griglia come Pokémon. Pulsanti A/B/X/Y: il dito puo' scorrere da uno
-// all'altro. Ogni dito e' tracciato separatamente (multi-touch).
+// Croce direzionale "scorrevole": un'unica area circolare (piu' grande del
+// disegno); la direzione dipende da dove si trova il dito rispetto al centro,
+// quindi si puo' trascinare senza alzarlo. 8 direzioni come la croce del
+// controller Xbox: ogni direzione, diagonali comprese, occupa 45° (si puo'
+// scegliere "diagonali strette" per i giochi a griglia). Pulsanti A/B/X/Y: il
+// dito puo' scorrere da uno all'altro. Ogni dito e' tracciato separatamente.
 
 import { BUTTON } from "./engine.js";
 import { h } from "./util.js";
 
 const DIRS = ["RIGHT", "DOWN", "LEFT", "UP"];
 
-/** Direzioni premute dato un vettore (dx, dy) normalizzato sul raggio. */
-export function dpadDirections(dx, dy, dead = 0.22) {
+export const DIAGONALS = {
+  xbox: 22.5, // 8 settori uguali da 45°, come la croce Xbox
+  narrow: 30, // diagonali da 30°: meno passi storti nei giochi a griglia
+};
+
+/**
+ * Direzioni premute dato un vettore (dx, dy) normalizzato sul raggio.
+ * cardinalHalf = mezza ampiezza del settore cardinale in gradi (22.5 = 8 settori uguali).
+ */
+export function dpadDirections(dx, dy, { dead = 0.2, cardinalHalf = DIAGONALS.xbox } = {}) {
   const dist = Math.hypot(dx, dy);
   if (dist < dead) return [];
   let ang = (Math.atan2(dy, dx) * 180) / Math.PI; // 0 = destra, 90 = giu'
@@ -21,8 +30,7 @@ export function dpadDirections(dx, dy, dead = 0.22) {
   const off = ang - sector * 90;
   const offN = ((off + 540) % 360) - 180;
   const main = DIRS[sector];
-  if (Math.abs(offN) <= 30) return [main];
-  // tra 30° e 45° dal cardinale: diagonale
+  if (Math.abs(offN) <= cardinalHalf) return [main];
   const other = DIRS[(sector + (offN > 0 ? 1 : 3)) % 4];
   return [main, other];
 }
@@ -56,6 +64,7 @@ export class TouchPad {
     this.root.classList.add("pad");
     this.root.dataset.system = this.system;
     this.root.dataset.dpad = s.dpad;
+    this.root.dataset.colors = s.colors || "theme";
     this.root.style.setProperty("--pad-opacity", s.opacity);
     this.root.style.setProperty("--pad-scale", s.scale);
     this.root.classList.toggle("no-labels", !s.labels);
@@ -63,6 +72,8 @@ export class TouchPad {
     const btn = (name, cls = "") => h("div.btn." + ("b-" + name.toLowerCase()) + (cls ? "." + cls : ""), { dataset: { btn: name }, "aria-label": name }, h("span", name === "SELECT" ? "Select" : name === "START" ? "Start" : name));
 
     this.dpad = h("div.dpad", { dataset: { zone: "dpad" } },
+      h("div.dpad-hit"),
+      h("div.dpad-base"),
       h("div.dpad-cross", h("i.up"), h("i.right"), h("i.down"), h("i.left"), h("i.center")),
       h("div.stick-base", h("div.stick-knob")));
     this.face = h("div.face.n" + lay.face.length, { dataset: { zone: "face" } }, lay.face.map((b) => btn(b, "face-btn")));
@@ -131,7 +142,7 @@ export class TouchPad {
     if (st.zone === "dpad") {
       const dx = (e.clientX - st.cx) / st.r;
       const dy = (e.clientY - st.cy) / st.r;
-      for (const d of dpadDirections(dx, dy)) next.add(d);
+      for (const d of dpadDirections(dx, dy, { cardinalHalf: DIAGONALS[this.settings.diagonals] || DIAGONALS.xbox })) next.add(d);
       const k = Math.min(1, Math.hypot(dx, dy));
       const a = Math.atan2(dy, dx);
       this.dpad.style.setProperty("--kx", (Math.cos(a) * k * 0.45).toFixed(3));

@@ -6,7 +6,7 @@ import * as store from "./store.js";
 import { loadSettings, saveSettings } from "./settings.js";
 import { applyTheme } from "./themes.js";
 import { icon, iconEl } from "./icons.js";
-import { h, $, toast, formatWhen, formatDuration, formatBytes, shareOrDownload, safeFileName, sleep } from "./util.js";
+import { h, $, toast, formatWhen, formatDuration, formatBytes, shareOrDownload, safeFileName, sleep, isIOS, isStandalone } from "./util.js";
 import { openSheet, closeAllSheets, sheetOpen, confirmDialog, stateCard, emptyState, segmented, toggle, slider, section, menuButton, blobUrl, kindLabel } from "./ui.js";
 import { tipsFor } from "./rominfo.js";
 
@@ -52,7 +52,9 @@ function fatal(title, message, actions = []) {
 
 async function boot() {
   settings = await loadSettings();
-  applyTheme(settings.theme);
+  applyTheme(settings.theme, settings.customTheme);
+  root.classList.toggle("immersive", !!settings.game.immersive);
+  updateFullscreenButton();
   $("#btn-menu").innerHTML = icon("menu");
   $("#btn-save").innerHTML = icon("save");
   $("#btn-pause").innerHTML = icon("pause");
@@ -135,7 +137,11 @@ function waitForTap(startState, sav) {
   return new Promise((resolve) => {
     overlay.hidden = false;
     overlayCard.innerHTML = "";
-    const go = () => resolve();
+    const go = () => {
+      // dentro il tocco: il browser permette lo schermo intero solo qui
+      if (settings.game.fullscreen && fsSupported() && !isStandalone()) enterFullscreen();
+      resolve();
+    };
     const iconImg = game.icon ? h("img.game-icon.big", { src: blobUrl(game.icon), alt: "" }) : null;
     let from;
     if (startState) {
@@ -151,6 +157,51 @@ function waitForTap(startState, sav) {
       h("p.muted.small", "Il tocco serve anche ad attivare l'audio su iPhone e iPad."));
     btn.focus();
   });
+}
+
+// ------------------------------------------------------------------ schermo intero
+
+const fsSupported = () => !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+const isFullscreen = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+
+function enterFullscreen() {
+  const el = document.documentElement;
+  try {
+    const p = el.requestFullscreen ? el.requestFullscreen({ navigationUI: "hide" }) : el.webkitRequestFullscreen();
+    if (p && p.catch) p.catch(() => {});
+  } catch (_) { /* rifiutato dal browser */ }
+}
+
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  } else if (fsSupported()) {
+    enterFullscreen();
+  } else {
+    alertFullscreenTip();
+  }
+}
+
+function alertFullscreenTip() {
+  import("./ui.js").then(({ alertDialog }) => alertDialog(isIOS()
+    ? "Su iPhone Safari non permette lo schermo intero alle pagine web. Installa Vesuvio: Condividi → «Aggiungi alla schermata Home». Aperta dall'icona, l'app occupa tutto lo schermo, senza barre del browser."
+    : "Questo browser non permette lo schermo intero. Prova a installare l'app dal menu del browser.", { title: "Schermo intero" }));
+}
+
+function updateFullscreenButton() {
+  const b = $("#btn-full");
+  b.hidden = isStandalone() && !fsSupported();
+  b.innerHTML = icon(isFullscreen() ? "shrink" : "expand");
+  b.setAttribute("aria-label", isFullscreen() ? "Esci dallo schermo intero" : "Schermo intero");
+}
+
+document.addEventListener("fullscreenchange", () => { updateFullscreenButton(); setTimeout(layout, 100); });
+document.addEventListener("webkitfullscreenchange", () => { updateFullscreenButton(); setTimeout(layout, 100); });
+
+async function setImmersive(v) {
+  settings = await saveSettings({ game: { immersive: v } });
+  root.classList.toggle("immersive", v);
+  layout();
 }
 
 // ------------------------------------------------------------------ layout
@@ -266,6 +317,7 @@ function setupInputs() {
   turboBtn.addEventListener("contextmenu", (e) => e.preventDefault());
 
   $("#btn-menu").onclick = () => openMenu();
+  $("#btn-full").onclick = () => toggleFullscreen();
   $("#btn-pause").onclick = () => togglePause();
   $("#btn-view").onclick = () => setView(view === "both" ? "top" : view === "top" ? "bottom" : "both");
   const saveBtn = $("#btn-save");
@@ -318,10 +370,11 @@ async function quickLoad() {
 
 function wireSession() {
   const sp = $("#speed");
-  sp.hidden = !settings.showSpeed;
+  sp.hidden = true; // compare alla prima misura
   session.addEventListener("speed", (e) => {
     const d = e.detail;
-    if (sp.hidden) return;
+    if (!settings.showSpeed) { sp.hidden = true; return; }
+    sp.hidden = false;
     const r = d.ratio;
     sp.textContent = d.turbo ? `×${r.toFixed(1)}${d.target ? " / " + d.target : " max"}` : `×${r.toFixed(2)}`;
     sp.classList.toggle("slow", !d.turbo && r < 0.9);
@@ -534,9 +587,17 @@ function openControlsSheet() {
       { value: "bottom", label: "Solo touch", icon: "bottom" },
     ], view, (v) => setView(v), { name: "Schermi" }), h("p.muted.small", "Vale per l'orientamento attuale (verticale o orizzontale): puoi avere una scelta diversa per ciascuno.")));
   }
+  content.push(section("Modalità gioco",
+    toggle("Nascondi la barra in alto", !!settings.game.immersive, (v) => setImmersive(v), "Restano solo il gioco, i controlli e un piccolo pulsante menu"),
+    toggle("Schermo intero all'avvio", !!settings.game.fullscreen, async (v) => { settings = await saveSettings({ game: { fullscreen: v } }); }, isIOS() && !isStandalone() ? "Su iPhone serve installare l'app sulla schermata Home" : "Android, PC e iPad"),
+    h("button.btn", { onclick: () => toggleFullscreen() }, iconEl(isFullscreen() ? "shrink" : "expand"), isFullscreen() ? "Esci dallo schermo intero" : "Schermo intero adesso")));
   content.push(section("Croce direzionale",
-    segmented([{ value: "slide", label: "Scorrevole" }, { value: "stick", label: "Analogico" }], c.dpad, (v) => apply({ dpad: v }), { name: "Croce" }),
-    h("p.muted.small", "Scorrevole: trascina il dito tra le direzioni senza alzarlo. Le diagonali sono strette per non sbagliare passo.")));
+    segmented([{ value: "slide", label: "Croce" }, { value: "stick", label: "Analogico" }], c.dpad, (v) => apply({ dpad: v }), { name: "Croce" }),
+    segmented([{ value: "xbox", label: "8 direzioni (Xbox)" }, { value: "narrow", label: "Diagonali strette" }], c.diagonals || "xbox", (v) => apply({ diagonals: v }), { name: "Diagonali" }),
+    h("p.muted.small", "Si trascina il dito senza alzarlo. «8 direzioni»: come la croce Xbox, le diagonali valgono quanto le direzioni dritte (45° ciascuna) e l'area sensibile è più grande del disegno. «Diagonali strette»: meno passi storti nei giochi a caselle.")));
+  content.push(section("Colori dei tasti",
+    segmented([{ value: "theme", label: "Del tema" }, { value: "classic", label: "Classici" }, { value: "mono", label: "Tinta unita" }], c.colors || "theme", (v) => apply({ colors: v }), { name: "Colori tasti" }),
+    h("p.muted.small", "Classici: A rosso, B giallo, X blu, Y verde.")));
   content.push(section("Aspetto",
     slider("Trasparenza", { min: 0.25, max: 1, step: 0.05, value: c.opacity, format: (v) => Math.round(v * 100) + "%" }, (v, done) => { $("#pad").style.setProperty("--pad-opacity", v); if (done) apply({ opacity: v }); }),
     slider("Dimensione", { min: 0.75, max: 1.3, step: 0.05, value: c.scale, format: (v) => Math.round(v * 100) + "%" }, (v, done) => { $("#pad").style.setProperty("--pad-scale", v); if (done) apply({ scale: v }).then(layout); }),

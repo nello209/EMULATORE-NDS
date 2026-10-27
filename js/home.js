@@ -3,7 +3,7 @@ import * as store from "./store.js";
 import { CORES } from "./engine.js";
 import { SYSTEMS, tipsFor, ROM_EXTS } from "./rominfo.js";
 import { loadSettings, saveSettings, DEFAULTS } from "./settings.js";
-import { THEMES, applyTheme } from "./themes.js";
+import { THEMES, applyTheme, customTheme } from "./themes.js";
 import { icon, iconEl } from "./icons.js";
 import { h, $, toast, formatWhen, formatDuration, formatBytes, formatDate, pickFile, shareOrDownload, safeFileName, isIOS, isStandalone } from "./util.js";
 import { openSheet, confirmDialog, alertDialog, stateCard, emptyState, segmented, toggle, slider, section, menuButton, blobUrl, kindLabel } from "./ui.js";
@@ -17,7 +17,7 @@ const playUrl = (id, state = "best", core = null) => `play.html?id=${encodeURICo
 
 async function boot() {
   settings = await loadSettings();
-  applyTheme(settings.theme);
+  applyTheme(settings.theme, settings.customTheme);
   $("#btn-guide").innerHTML = icon("info");
   $("#btn-settings").innerHTML = icon("settings");
   $("#btn-add").innerHTML = icon("plus") + "<span>Aggiungi gioco</span>";
@@ -317,16 +317,25 @@ function openSettings() {
 
 function settingsContent(rerender) {
   const save = async (patch, re = false) => { settings = await saveSettings(patch); if (re) rerender(); };
-  const themes = h("div.theme-grid", Object.entries(THEMES).map(([id, t]) => h("button.theme-swatch" + (settings.theme === id ? ".on" : ""), {
-    style: { "--sw-bg": t.bg, "--sw-surface": t.surface, "--sw-accent": t.accent, "--sw-accent2": t.accent2, "--sw-text": t.text },
-    onclick: async () => { applyTheme(id); await save({ theme: id }, true); },
+  const all = [...Object.entries(THEMES), ["custom", customTheme(settings.customTheme)]];
+  const themes = h("div.theme-grid", all.map(([id, t]) => h("button.theme-swatch" + (settings.theme === id ? ".on" : ""), {
+    style: { "--sw-bg": t.bg, "--sw-surface": t.surface, "--sw-accent": t.accent, "--sw-accent2": t.accent2, "--sw-text": t.text, "--sw-4": (t.faces && t.faces[2]) || t.btn },
+    onclick: async () => { applyTheme(id, settings.customTheme); await save({ theme: id }, true); },
     "aria-label": "Tema " + t.name,
-  }, h("span.sw-preview", h("i"), h("i"), h("i")), h("strong", t.name), h("small", t.desc))));
+  }, h("span.sw-preview", h("i"), h("i"), h("i"), h("i")), h("strong", t.name), h("small", t.desc))));
+  const ct = settings.customTheme;
+  const colorInput = (key, label) => h("label.color-field", h("input", {
+    type: "color", value: ct[key],
+    oninput: (e) => applyTheme("custom", { ...settings.customTheme, [key]: e.target.value }),
+    onchange: async (e) => { await save({ customTheme: { [key]: e.target.value }, theme: "custom" }); applyTheme("custom", settings.customTheme); rerender(); },
+  }), h("span", label));
+  const customBox = h("div.custom-theme", h("p.muted.small", "Tema personalizzato: scegli i tuoi colori (si applica subito)."),
+    h("div.color-row", colorInput("bg", "Sfondo"), colorInput("accent", "Colore principale"), colorInput("accent2", "Secondo colore"), colorInput("btn", "Tasti")));
   const a = settings.autosave;
   const w = settings.watchdog;
   const c = settings.controls;
   return [
-    section("Tema", themes),
+    section("Tema", themes, customBox),
     section("Salvataggi automatici",
       h("p.muted.small", "Ogni intervallo, solo se stai giocando (niente salvataggi a gioco fermo, durante l'avvio o subito dopo un ripristino). Ogni " + a.checkpointEveryMin + " minuti uno diventa «checkpoint» e resta più a lungo."),
       segmented([15, 30, 60, 120].map((v) => ({ value: v, label: v < 60 ? v + " s" : v / 60 + " min" })), a.intervalSec, (v) => save({ autosave: { intervalSec: v } }), { name: "Intervallo" }),
@@ -339,10 +348,15 @@ function settingsContent(rerender) {
       h("label.field", h("span", "Immagine ferma da"), segmented([30, 60, 120, 99999].map((v) => ({ value: v, label: v > 9999 ? "Mai" : v + " s" })), w.softSec, (v) => save({ watchdog: { softSec: v } }), { name: "Immagine ferma" }))),
     section("Controlli touch",
       segmented([{ value: "slide", label: "Croce scorrevole" }, { value: "stick", label: "Analogico" }], c.dpad, (v) => save({ controls: { dpad: v } }), { name: "Croce" }),
+      segmented([{ value: "xbox", label: "8 direzioni (come Xbox)" }, { value: "narrow", label: "Diagonali strette" }], c.diagonals || "xbox", (v) => save({ controls: { diagonals: v } }), { name: "Diagonali" }),
+      segmented([{ value: "theme", label: "Tasti del tema" }, { value: "classic", label: "Classici" }, { value: "mono", label: "Tinta unita" }], c.colors || "theme", (v) => save({ controls: { colors: v } }), { name: "Colori tasti" }),
       slider("Trasparenza", { min: 0.25, max: 1, step: 0.05, value: c.opacity, format: (v) => Math.round(v * 100) + "%" }, (v, d) => d && save({ controls: { opacity: v } })),
       slider("Dimensione", { min: 0.75, max: 1.3, step: 0.05, value: c.scale, format: (v) => Math.round(v * 100) + "%" }, (v, d) => d && save({ controls: { scale: v } })),
       toggle("Lettere sui tasti", c.labels, (v) => save({ controls: { labels: v } })),
       toggle("Vibrazione (solo Android)", c.haptics, (v) => save({ controls: { haptics: v } }))),
+    section("Modalità gioco",
+      toggle("Nascondi la barra in alto durante il gioco", !!settings.game.immersive, (v) => save({ game: { immersive: v } }), "Solo gioco e controlli; il menu resta in un angolo"),
+      toggle("Schermo intero all'avvio del gioco", !!settings.game.fullscreen, (v) => save({ game: { fullscreen: v } }), "Su iPhone si ottiene installando l'app sulla schermata Home")),
     section("Turbo",
       segmented([1.5, 2, 3, 4, 6, 0].map((v) => ({ value: v, label: v ? "×" + v : "Max" })), settings.turbo.ratio, (v) => save({ turbo: { ratio: v } }), { name: "Velocità" }),
       segmented([{ value: "toggle", label: "Tocca: acceso/spento" }, { value: "hold", label: "Tieni premuto" }], settings.turbo.mode, (v) => save({ turbo: { mode: v } }), { name: "Modalità" }),

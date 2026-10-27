@@ -4,7 +4,9 @@ import { get, put } from "./db.js";
 
 export const DEFAULTS = {
   theme: "vesuvio",
-  controls: { opacity: 0.8, scale: 1, dpad: "slide", haptics: true, labels: true },
+  controls: { opacity: 0.8, scale: 1, dpad: "slide", diagonals: "xbox", colors: "theme", haptics: true, labels: true },
+  customTheme: { bg: "#120d24", accent: "#ff4fa3", accent2: "#41e0ff", btn: "#2d2550" },
+  game: { immersive: false, fullscreen: true },
   turbo: { mode: "toggle", ratio: 3, mute: true },
   autosave: {
     intervalSec: 30,

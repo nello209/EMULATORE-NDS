@@ -16,12 +16,15 @@
 :root[data-theme="smeraldo"] { --bg: #07120d; --surface: #0d1e16; --surface-2: #143023; --text: #eefff6; --muted: #97c4ad; --accent: #2ee59d; --accent-2: #b7f171; --btn: #173a2a; }
 :root[data-theme="kanto"] { --bg: #151517; --surface: #202024; --surface-2: #2c2c32; --text: #fff; --muted: #b5b5bd; --accent: #e3350d; --accent-2: #fff; --btn: #38383f; }
 :root[data-theme="cielo"] { --bg: #0a1a2a; --surface: #10283f; --surface-2: #183a59; --text: #f1f8ff; --muted: #9cc0dd; --accent: #ff8a1f; --accent-2: #5cc8ff; --btn: #1f4c74; }
+:root[data-theme="tramonto"] { --bg: #1a0f2e; --surface: #26173f; --surface-2: #34205a; --text: #fff5ec; --muted: #c9a9d6; --accent: #ff7a45; --accent-2: #ffd23f; --btn: #3b2563; }
+:root[data-theme="aurora"] { --bg: #061a1f; --surface: #0b2a31; --surface-2: #123b44; --text: #ecfffb; --muted: #93c9c2; --accent: #31f2c1; --accent-2: #b06bff; --btn: #15444d; }
+:root[data-theme="arcade"] { --bg: #0a0a14; --surface: #14142a; --surface-2: #1f1f3d; --text: #f4f4ff; --muted: #a0a0d0; --accent: #ff2e88; --accent-2: #00e5ff; --btn: #25254a; }
 :root[data-theme="carta"] { --bg: #f3f1ec; --surface: #fff; --surface-2: #e9e5dc; --text: #1d1b18; --muted: #6b665d; --accent: #d9480f; --accent-2: #1c7ed6; --btn: #2b2a28; color-scheme: light; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.45;
+  background: var(--bg) radial-gradient(90% 50% at 100% 0%, color-mix(in srgb, var(--glow-2, var(--accent-2)) 10%, transparent), transparent 70%) no-repeat; color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.45;
   -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; text-size-adjust: 100%;
 }
 a { color: var(--accent); }
@@ -228,6 +231,13 @@ img { max-width: 100%; }
 .sw-preview i { width: 22px; height: 22px; border-radius: 50%; background: var(--sw-surface); }
 .sw-preview i:nth-child(2) { background: var(--sw-accent); }
 .sw-preview i:nth-child(3) { background: var(--sw-accent2); }
+.sw-preview i:nth-child(4) { background: var(--sw-4); }
+.custom-theme { margin-top: 12px; background: var(--surface-2); border-radius: 14px; padding: 12px; }
+.color-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 8px; }
+.color-field { display: flex; align-items: center; gap: 8px; font-size: .9rem; cursor: pointer; }
+.color-field input { width: 44px; height: 44px; border: 0; padding: 0; border-radius: 12px; background: none; cursor: pointer; }
+.color-field input::-webkit-color-swatch-wrapper { padding: 0; }
+.color-field input::-webkit-color-swatch { border: 2px solid color-mix(in srgb, var(--text) 25%, transparent); border-radius: 12px; }
 
 .game-head { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
 .game-head p { margin: 2px 0; }
@@ -265,7 +275,10 @@ img { max-width: 100%; }
 .play-page { position: fixed; inset: 0; overflow: hidden; overscroll-behavior: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; background: #000; }
 .game-root {
   position: fixed; inset: 0; display: grid; --pad-h: 260px; --side: 200px;
-  background: radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--surface) 80%, #000) 0%, #050507 70%);
+  background:
+    radial-gradient(60% 45% at 0% 100%, color-mix(in srgb, var(--glow-1, var(--accent)) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(60% 45% at 100% 100%, color-mix(in srgb, var(--glow-2, var(--accent-2)) 20%, transparent) 0%, transparent 70%),
+    radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--surface) 80%, #000) 0%, #050507 70%);
 }
 .game-root[data-orient="portrait"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) var(--pad-h); grid-template-areas: "bar" "stage" "pad"; }
 .game-root[data-orient="landscape"] { grid-template-columns: var(--side) minmax(0, 1fr) var(--side); grid-template-rows: minmax(0, 1fr); grid-template-areas: "l stage r"; }
@@ -281,7 +294,7 @@ img { max-width: 100%; }
 .game-root[data-orient="landscape"] .game-bar { position: absolute; top: 0; left: 0; right: 0; justify-content: flex-start; pointer-events: none; background: none; }
 .game-root[data-orient="landscape"] .game-bar > * { pointer-events: auto; }
 .game-root[data-orient="landscape"] .game-title { flex: 0 1 auto; max-width: calc(var(--side) - 110px); font-size: .82rem; color: var(--muted); }
-.game-root[data-orient="landscape"] .game-bar #btn-view { margin-left: auto; }
+.game-root[data-orient="landscape"] .game-bar #btn-full { margin-left: auto; }
 .stage { grid-area: stage; display: flex; align-items: center; justify-content: center; min-height: 0; min-width: 0; overflow: hidden; position: relative; }
 .game-root[data-orient="portrait"] .stage { padding: 0 max(6px, var(--safe-l)); }
 .game-root[data-orient="landscape"] .stage { padding: var(--safe-t) 0 var(--safe-b); }
@@ -294,6 +307,13 @@ img { max-width: 100%; }
 .game-root.paused .stage::after {
   content: "In pausa"; position: absolute; padding: 8px 16px; border-radius: 999px; background: rgba(0, 0, 0, .6); font-weight: 700; pointer-events: none;
 }
+
+/* modalità immersiva: solo il gioco e i controlli, il menu resta in un angolo */
+.game-root.immersive[data-orient="portrait"] { grid-template-rows: 0 minmax(0, 1fr) var(--pad-h); }
+.game-root.immersive .game-bar { position: absolute; top: 0; left: 0; right: auto; background: none; padding: calc(6px + var(--safe-t)) 0 0 max(8px, var(--safe-l)); }
+.game-root.immersive .game-bar > *:not(#btn-menu):not(#btn-turbo) { display: none; }
+.game-root.immersive .game-bar .icon-btn { width: 36px; height: 36px; opacity: .55; }
+.game-root.immersive[data-orient="portrait"] .stage { padding-top: calc(4px + var(--safe-t)); }
 
 /* overlay di caricamento e messaggi */
 .overlay { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 20px; touch-action: manipulation; }
@@ -353,7 +373,16 @@ img { max-width: 100%; }
 .pad .face.n4 .b-a.pressed, .pad .face.n4 .b-y.pressed { transform: translateY(-50%) translateY(3px) scale(.96); }
 .pad .face.n2 .b-a { right: 0; top: 12%; width: calc(var(--u) * 1.2); height: calc(var(--u) * 1.2); }
 .pad .face.n2 .b-b { left: 0; bottom: 12%; width: calc(var(--u) * 1.2); height: calc(var(--u) * 1.2); }
-.pad .face .b-a { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 100%, #fff 12%), var(--accent)); color: #fff; }
+.pad .face .btn { --fc: var(--btn); background: linear-gradient(180deg, color-mix(in srgb, var(--fc) 100%, #fff 14%), var(--fc)); color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .35); }
+.pad[data-colors="theme"] .face .b-a { --fc: var(--face-a); }
+.pad[data-colors="theme"] .face .b-b { --fc: var(--face-b); }
+.pad[data-colors="theme"] .face .b-x { --fc: var(--face-x); }
+.pad[data-colors="theme"] .face .b-y { --fc: var(--face-y); }
+.pad[data-colors="classic"] .face .b-a { --fc: var(--classic-a); }
+.pad[data-colors="classic"] .face .b-b { --fc: var(--classic-b); }
+.pad[data-colors="classic"] .face .b-x { --fc: var(--classic-x); }
+.pad[data-colors="classic"] .face .b-y { --fc: var(--classic-y); }
+.pad .face .btn.pressed { box-shadow: 0 1px 0 rgba(0, 0, 0, .45), 0 0 18px color-mix(in srgb, var(--fc) 70%, transparent); }
 .pad .btn.shoulder { position: absolute; top: 2px; width: calc(var(--u) * 1.55); height: calc(var(--u) * .62); border-radius: 12px; font-size: calc(var(--u) * .3); }
 .pad .left .shoulder { left: 0; border-top-left-radius: 20px; }
 .pad .right .shoulder { right: 0; border-top-right-radius: 20px; }
@@ -362,7 +391,10 @@ img { max-width: 100%; }
 
 /* croce direzionale */
 .dpad { position: relative; width: calc(var(--u) * 2.75); height: calc(var(--u) * 2.75); touch-action: none; --kx: 0; --ky: 0; }
-.dpad-cross { position: absolute; inset: 0; }
+.dpad-hit { position: absolute; inset: -22%; border-radius: 50%; }
+.dpad-base { position: absolute; inset: -6%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--btn) 55%, transparent) 0%, color-mix(in srgb, var(--btn) 25%, transparent) 62%, transparent 72%); pointer-events: none; }
+.pad[data-dpad="stick"] .dpad-base { display: none; }
+.dpad-cross { position: absolute; inset: 0; pointer-events: none; }
 .dpad-cross i { position: absolute; background: linear-gradient(180deg, color-mix(in srgb, var(--btn) 100%, #fff 8%), var(--btn)); box-shadow: 0 4px 0 rgba(0, 0, 0, .45); }
 .dpad-cross .up, .dpad-cross .down { left: 33.5%; width: 33%; height: 36%; }
 .dpad-cross .left, .dpad-cross .right { top: 33.5%; height: 33%; width: 36%; }
@@ -378,7 +410,7 @@ img { max-width: 100%; }
 .dpad-cross .left::before { border-right-color: var(--btn-text); border-left-width: 0; }
 .dpad-cross .right::before { border-left-color: var(--btn-text); border-right-width: 0; }
 .dpad.p-up .up, .dpad.p-down .down, .dpad.p-left .left, .dpad.p-right .right { filter: brightness(1.5); background: var(--accent); box-shadow: 0 1px 0 rgba(0, 0, 0, .45); }
-.stick-base { display: none; position: absolute; inset: 6%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--btn) 80%, transparent) 0%, color-mix(in srgb, var(--btn) 55%, transparent) 70%); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .08); }
+.stick-base { display: none; pointer-events: none; position: absolute; inset: 6%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--btn) 80%, transparent) 0%, color-mix(in srgb, var(--btn) 55%, transparent) 70%); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .08); }
 .stick-knob { position: absolute; left: 50%; top: 50%; width: 44%; height: 44%; border-radius: 50%; transform: translate(calc(-50% + var(--kx) * 100% * 2.27), calc(-50% + var(--ky) * 100% * 2.27)); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 100%, #fff 15%), var(--accent)); box-shadow: 0 6px 12px rgba(0, 0, 0, .45); }
 .pad[data-dpad="stick"] .dpad-cross { display: none; }
 .pad[data-dpad="stick"] .stick-base { display: block; }

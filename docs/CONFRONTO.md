@@ -17,9 +17,10 @@ Le informazioni su Unova Pocket vengono solo dalla descrizione ricevuta: non ho 
 | Base di emulazione | EmulatorJS 4.2.3 + melonDS, menu di EmulatorJS nascosto | Stessi core di EmulatorJS 4.2.3 ma **pilotati direttamente** da un motore proprio (`js/engine.js`): nessuna interfaccia EmulatorJS da nascondere |
 | Sistemi | DS | DS, GBA, GB, GBC; per il DS 3 motori a scelta (melonDS, DeSmuME 2015, DeSmuME) |
 | Touch DS | tocco diretto | **migliore** ✅: modalità assoluta (quella predefinita "Mouse" usa spostamenti relativi e può sfasarsi) + correzione di un difetto del frontend che spostava il tocco sugli schermi ad alta densità (iPhone/iPad). Test a densità 1×/2×/3×, con trascinamento e in vista «solo touch» |
-| Croce direzionale | scorrevole o analogico | equivalente, con diagonali strette (30°) per i giochi a griglia; test del trascinamento e del multi-touch ✅ |
+| Croce direzionale | scorrevole o analogico | equivalente: 8 direzioni da 45° come la croce Xbox (o diagonali strette a scelta), area sensibile più grande del disegno; test del trascinamento e del multi-touch ✅ |
 | Viste schermi | Gioco / Touch / Entrambi | equivalente, con scelta separata per verticale e orizzontale |
-| Temi | più palette, tema Napoli | equivalente (8 temi, Napoli compreso) |
+| Temi | più palette, tema Napoli | equivalente o migliore: 12 temi (anche multicolore), tema personalizzato, colori dei tasti |
+| Modalità gioco | schermo intero | equivalente: schermo intero + barra nascosta (su iPhone solo come app installata) |
 | Riconoscimento ROM | gioco/revisione | equivalente + icona e titolo italiano dal banner del DS, ROM dentro `.zip` ✅ |
 | Turbo | velocità selezionabili, velocità effettiva | equivalente + misura del massimo del dispositivo, modalità «tieni premuto», audio silenziato in turbo |
 | Salvataggi locali | backup ogni 30 s, copie per sessione e pre-ripristino | **migliore**: autosalvataggi «con controllo di salute», miniature, `.sav` versionato, quote separate (vedi §2) ✅ |
@@ -137,7 +138,11 @@ Già presenti (✅, tutti ripetibili con `npm test`, `npm run test:e2e`, `npm ru
 - GBA: layout orizzontale, versioni del `.sav`, turbo reale, funzionamento offline;
 - test di durata: sessione continua con turbo al massimo, input e autosalvataggi ogni 10 s; misura
   velocità, memoria JS, numero di stati e spazio nel tempo. Risultato di 30 minuti:
-  [soak-melonds-30min.json](soak-melonds-30min.json) e riepilogo sotto.
+  [soak-melonds-30min.json](soak-melonds-30min.json): 100.906 fotogrammi emulati (≈ 28 minuti di gioco),
+  velocità media ×0,94 nel primo quarto e ×0,94 nell'ultimo (nessun degrado nel tempo; ×0,94 è il limite di
+  questo server), memoria JS da 10 a 14 MB, al massimo 19 stati (12 automatici + 6 checkpoint + 1 manuale:
+  la quota funziona), salvataggio più lento 457 ms, 0 blocchi, 0 errori. ❓ Non dice nulla sulle cause del
+  rallentamento su iPad descritto per Unova Pocket: va ripetuto sul dispositivo (punto 1 sotto).
 
 Da fare con una ROM reale (richiede che tu o il tuo amico lo eseguiate con la vostra copia):
 1. **Sessione lunga sull'iPad** con «Diagnostica» → esporta rapporto: velocità minuto per minuto e durata dei

@@ -4,7 +4,7 @@ Emulatore **Nintendo DS**, **Game Boy Advance**, **Game Boy** e **Game Boy Color
 e si installa come app su iPhone, iPad, Android e PC. Pensato per giocare a Pokémon (e non solo) dal
 telefono, con salvataggi che non si perdono.
 
-**Sito:** https://nello209.github.io/emulatore-nds/ *(attivo dopo aver abilitato GitHub Pages, vedi sotto)*
+**Sito:** https://nello209.github.io/EMULATORE-NDS/ *(attivo dopo aver abilitato GitHub Pages, vedi sotto)*
 
 > Vesuvio non contiene giochi né BIOS. Usa solo copie dei giochi che possiedi: la ROM resta sul tuo
 > dispositivo e non viene caricata da nessuna parte.
@@ -17,8 +17,9 @@ telefono, con salvataggi che non si perdono.
   senza l'interfaccia di EmulatorJS (niente menu nascosti che si sovrappongono al gioco).
 - **Touch screen del DS preciso**: coordinate assolute e correzione per gli schermi ad alta densità
   (iPhone/iPad). Verificato con test automatici a densità 1×, 2× e 3× e trascinando il dito.
-- **Controlli touch**: croce direzionale scorrevole (si trascina senza alzare il dito, diagonali strette per
-  non sbagliare passo) o analogico; A/B/X/Y con scorrimento tra i tasti; multi-touch; trasparenza e
+- **Controlli touch**: croce direzionale a **8 direzioni come quella Xbox** (diagonali da 45° come le direzioni
+  dritte, area sensibile più grande del disegno, si trascina senza alzare il dito; in alternativa «diagonali
+  strette») o analogico; A/B/X/Y con scorrimento tra i tasti; multi-touch; trasparenza e
   dimensione regolabili; layout verticale e orizzontale separati. Tastiera e controller (Xbox, PlayStation,
   MFi) sul PC e sull'iPad.
 - **Schermi DS**: entrambi, solo gioco o solo touch, con una scelta diversa per verticale e orizzontale.
@@ -42,8 +43,15 @@ telefono, con salvataggi che non si perdono.
 - **Backup e trasferimento** senza account: un `.zip` per gioco (o per tutti), da inviare con AirDrop,
   WhatsApp, iCloud Drive… e reimportare sull'altro dispositivo. Niente accessi che scadono.
 - **Offline**: dopo la prima apertura funziona senza rete (verificato con test).
-- **8 temi**: Vesuvio, Napoli, Unima (bianco/nero), Ametista, Smeraldo, Poké Ball, Cielo, Carta (chiaro).
+- **12 temi**, anche multicolore (Neon Arcade, Tramonto, Aurora: tasti A/B/X/Y di colori diversi e sfondo
+  con bagliore nei colori del tema), più Vesuvio, Napoli, Unima, Ametista, Smeraldo, Poké Ball, Cielo, Carta
+  (chiaro) e un tema **Personalizzato** con i tuoi 4 colori. Tasti anche nei colori classici (A rosso, B giallo,
+  X blu, Y verde).
+- **Modalità gioco**: schermo intero (Android, PC, iPad; su iPhone installando l'app sulla Home) e barra
+  nascosta, con solo gioco, controlli e un piccolo pulsante menu.
 - Consigli specifici per i Pokémon riconosciuti (per Nero/Bianco: C-Gear).
+
+![Temi](docs/img/temi.png)
 
 ## Installarlo sul telefono
 
@@ -70,7 +78,8 @@ coordinate del touch, così i test possono controllare cosa «vede» il gioco.
 | Turbo GBA: ×2 richiesto → ×1,95 misurato | ✅ test automatico |
 | Backup `.zip`: esporta/reimporta senza duplicati né perdite | ✅ test automatico |
 | Funzionamento offline | ✅ test automatico |
-| Sessione lunga senza rallentamenti né crescita della memoria | ✅ test automatico (vedi [docs/CONFRONTO.md](docs/CONFRONTO.md)) |
+| Sessione di 30 minuti (turbo, autosalvataggi ogni 10 s): velocità uguale tra inizio e fine, memoria JS 10 → 14 MB, stati entro la quota, 0 blocchi | ✅ test automatico ([risultati](docs/soak-melonds-30min.json)) |
+| Croce a 8 direzioni: ogni direzione copre 45°, diagonali comprese | ✅ test automatico |
 | **Pokémon Bianco/Nero o qualsiasi gioco commerciale** | ❌ **non provato**: non ho (e non posso usare) ROM commerciali |
 | **iPhone / iPad / Safari reale** | ❌ **non provato**: i test girano in Chromium su Linux |
 | Velocità reale del DS su iPad, turbo ×2/×5 su DS | ❌ da misurare sul dispositivo (c'è il pulsante «Misura il turbo massimo») |

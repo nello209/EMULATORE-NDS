@@ -13,15 +13,28 @@ test("direzioni cardinali", () => {
   assert.deepEqual(dpadDirections(0, -1), ["UP"]);
 });
 
-test("i settori cardinali sono larghi (±30°): un pollice un po' storto non fa diagonali", () => {
-  const a = (deg) => [Math.cos((deg * Math.PI) / 180), Math.sin((deg * Math.PI) / 180)];
-  assert.deepEqual(dpadDirections(...a(25)), ["RIGHT"]);
-  assert.deepEqual(dpadDirections(...a(-28)), ["RIGHT"]);
-  assert.deepEqual(dpadDirections(...a(115)), ["DOWN"]);
+const a = (deg) => [Math.cos((deg * Math.PI) / 180), Math.sin((deg * Math.PI) / 180)];
+
+test("stile Xbox (predefinito): 8 settori uguali da 45°, diagonali facili da prendere", () => {
+  assert.deepEqual(dpadDirections(...a(20)), ["RIGHT"]);
+  assert.deepEqual(new Set(dpadDirections(...a(25))), new Set(["RIGHT", "DOWN"]));
+  assert.deepEqual(new Set(dpadDirections(...a(65))), new Set(["RIGHT", "DOWN"]));
+  assert.deepEqual(dpadDirections(...a(70)), ["DOWN"]);
+  // ogni direzione copre esattamente 45°
+  const counts = {};
+  for (let d = 0; d < 360; d += 0.5) { const k = dpadDirections(...a(d)).sort().join("+"); counts[k] = (counts[k] || 0) + 0.5; }
+  assert.equal(Object.keys(counts).length, 8);
+  for (const v of Object.values(counts)) assert.ok(Math.abs(v - 45) <= 1, JSON.stringify(counts));
 });
 
-test("diagonali nei settori stretti", () => {
-  const a = (deg) => [Math.cos((deg * Math.PI) / 180), Math.sin((deg * Math.PI) / 180)];
+test("diagonali strette (opzione): settori cardinali da ±30°", () => {
+  const n = { cardinalHalf: 30 };
+  assert.deepEqual(dpadDirections(...a(25), n), ["RIGHT"]);
+  assert.deepEqual(dpadDirections(...a(-28), n), ["RIGHT"]);
+  assert.deepEqual(new Set(dpadDirections(...a(40), n)), new Set(["RIGHT", "DOWN"]));
+});
+
+test("le quattro diagonali", () => {
   assert.deepEqual(new Set(dpadDirections(...a(45))), new Set(["RIGHT", "DOWN"]));
   assert.deepEqual(new Set(dpadDirections(...a(-45))), new Set(["RIGHT", "UP"]));
   assert.deepEqual(new Set(dpadDirections(...a(225))), new Set(["LEFT", "UP"]));
