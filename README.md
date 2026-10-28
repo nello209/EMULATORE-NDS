@@ -43,15 +43,21 @@ telefono, con salvataggi che non si perdono.
 - **Backup e trasferimento** senza account: un `.zip` per gioco (o per tutti), da inviare con AirDrop,
   WhatsApp, iCloud Drive… e reimportare sull'altro dispositivo. Niente accessi che scadono.
 - **Offline**: dopo la prima apertura funziona senza rete (verificato con test).
-- **12 temi**, anche multicolore (Neon Arcade, Tramonto, Aurora: tasti A/B/X/Y di colori diversi e sfondo
-  con bagliore nei colori del tema), più Vesuvio, Napoli, Unima, Ametista, Smeraldo, Poké Ball, Cielo, Carta
+- **Trucchi (Action Replay)** per gioco, attivabili e disattivabili, importabili da file `.cht`; prima di
+  attivarne uno viene creato uno stato di sicurezza. Verificati con test su melonDS e DeSmuME 2015, compresa
+  la correzione di un difetto del core melonDS che troncava i valori da 0x80000000 in su (es. il comune
+  terminatore `D2000000`). Nessun codice precaricato: incolli quelli per la tua versione del gioco.
+- **13 temi**, anche multicolore (Neon Arcade, Tramonto, Aurora: tasti A/B/X/Y di colori diversi e sfondo
+  con bagliore nei colori del tema), più Ghiaccio, Vesuvio, Napoli, Unima, Ametista, Smeraldo, Poké Ball, Cielo, Carta
   (chiaro) e un tema **Personalizzato** con i tuoi 4 colori. Tasti anche nei colori classici (A rosso, B giallo,
   X blu, Y verde).
 - **Modalità gioco**: schermo intero (Android, PC, iPad; su iPhone installando l'app sulla Home) e barra
   nascosta, con solo gioco, controlli e un piccolo pulsante menu.
 - Consigli specifici per i Pokémon riconosciuti (per Nero/Bianco: C-Gear).
 
-![Temi](docs/img/temi.png)
+![Vesuvio su telefono](docs/img/vesuvio.png)
+
+![Vesuvio su iPad](docs/img/ipad.png)
 
 ## Installarlo sul telefono
 
@@ -80,6 +86,8 @@ coordinate del touch, così i test possono controllare cosa «vede» il gioco.
 | Funzionamento offline | ✅ test automatico |
 | Sessione di 30 minuti (turbo, autosalvataggi ogni 10 s): velocità uguale tra inizio e fine, memoria JS 10 → 14 MB, stati entro la quota, 0 blocchi | ✅ test automatico ([risultati](docs/soak-melonds-30min.json)) |
 | Croce a 8 direzioni: ogni direzione copre 45°, diagonali comprese | ✅ test automatico |
+| Trucchi Action Replay (anche su più righe, con valori ≥ 0x80000000) su melonDS e DeSmuME 2015 | ✅ test automatico |
+| Trucchi su GBA/GB | ⚠️ non verificato |
 | **Pokémon Bianco/Nero o qualsiasi gioco commerciale** | ❌ **non provato**: non ho (e non posso usare) ROM commerciali |
 | **iPhone / iPad / Safari reale** | ❌ **non provato**: i test girano in Chromium su Linux |
 | Velocità reale del DS su iPad, turbo ×2/×5 su DS | ❌ da misurare sul dispositivo (c'è il pulsante «Misura il turbo massimo») |

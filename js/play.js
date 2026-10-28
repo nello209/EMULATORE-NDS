@@ -9,6 +9,8 @@ import { icon, iconEl } from "./icons.js";
 import { h, $, toast, formatWhen, formatDuration, formatBytes, shareOrDownload, safeFileName, sleep, isIOS, isStandalone } from "./util.js";
 import { openSheet, closeAllSheets, sheetOpen, confirmDialog, stateCard, emptyState, segmented, toggle, slider, section, menuButton, blobUrl, kindLabel } from "./ui.js";
 import { tipsFor } from "./rominfo.js";
+import { CHEAT_SUPPORT, normalizeCode, parseCht } from "./cheats.js";
+import { uid, pickFile } from "./util.js";
 
 const params = new URLSearchParams(location.search);
 const root = $("#game");
@@ -56,7 +58,7 @@ async function boot() {
   root.classList.toggle("immersive", !!settings.game.immersive);
   updateFullscreenButton();
   $("#btn-menu").innerHTML = icon("menu");
-  $("#btn-save").innerHTML = icon("save");
+  $("#btn-save").innerHTML = icon("save") + '<span class="lbl">Salva</span>';
   $("#btn-pause").innerHTML = icon("pause");
   $("#btn-turbo").insertAdjacentHTML("afterbegin", icon("turbo"));
 
@@ -123,6 +125,8 @@ async function boot() {
     }
   }
   await session.begin({ fromState });
+  const active = engine.setCheats(game.cheats || []);
+  if (active) toast(`${active} trucc${active === 1 ? "o attivo" : "hi attivi"}`);
   wireSession();
   setupInputs();
   hideOverlay();
@@ -233,7 +237,8 @@ function layout() {
   const cs = getComputedStyle(stage);
   const availW = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   const availH = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-  let scale = Math.min(availW / c.w, availH / c.h);
+  const bz = parseFloat(getComputedStyle(root).getPropertyValue("--bz")) || 0;
+  let scale = Math.min((availW - 2 * bz) / c.w, (availH - 2 * bz) / c.h);
   // scala intera quando ci si avvicina: pixel piu' nitidi
   const int = Math.floor(scale);
   if (int >= 2 && scale - int < 0.12) scale = int;
@@ -247,6 +252,7 @@ function layout() {
   vb.hidden = game.system !== "nds";
   vb.innerHTML = icon(view === "both" ? "screens" : view === "top" ? "top" : "bottom");
   vb.setAttribute("aria-label", "Schermi: " + viewName(view));
+  if (!paused) $("#strip-label").textContent = stripLabel();
 }
 
 const viewName = (v) => ({ both: "entrambi", top: "solo gioco", bottom: "solo touch" }[v]);
@@ -339,8 +345,14 @@ function updateBar() {
   t.classList.toggle("on", !!engine?.fastForward);
   t.querySelector(".turbo-x").textContent = turboLabel(settings.turbo.ratio);
   $("#btn-pause").innerHTML = icon(paused ? "play" : "pause");
+  $("#strip-label").textContent = paused ? "In pausa" : stripLabel();
   $("#btn-pause").setAttribute("aria-label", paused ? "Riprendi" : "Pausa");
   root.classList.toggle("paused", paused);
+}
+
+function stripLabel() {
+  if (game.system === "nds") return view === "bottom" ? "Schermo touch" : view === "top" ? "Schermo di gioco" : "Dual screen · touch";
+  return { gba: "Game Boy Advance", gbc: "Game Boy Color", gb: "Game Boy" }[game.system] || "";
 }
 
 function togglePause(force) {
@@ -370,13 +382,13 @@ async function quickLoad() {
 
 function wireSession() {
   const sp = $("#speed");
-  sp.hidden = true; // compare alla prima misura
+  sp.hidden = !settings.showSpeed;
   session.addEventListener("speed", (e) => {
     const d = e.detail;
-    if (!settings.showSpeed) { sp.hidden = true; return; }
-    sp.hidden = false;
+    sp.hidden = !settings.showSpeed;
+    if (sp.hidden) return;
     const r = d.ratio;
-    sp.textContent = d.turbo ? `×${r.toFixed(1)}${d.target ? " / " + d.target : " max"}` : `×${r.toFixed(2)}`;
+    sp.textContent = d.turbo ? `Turbo ×${r.toFixed(1)}${d.target ? "/" + d.target : " max"}` : `×${r.toFixed(2)}`;
     sp.classList.toggle("slow", !d.turbo && r < 0.9);
     sp.classList.toggle("turbo", d.turbo);
   });
@@ -461,6 +473,7 @@ function openMenu() {
           menuButton("load", "Carica stato", () => openStates()),
           menuButton("turbo", "Velocità", () => openTurboSheet()),
           menuButton("gamepad", "Schermo e controlli", () => openControlsSheet()),
+          menuButton("bolt", "Trucchi", () => openCheats(), { hint: (game.cheats || []).filter((c) => c.enabled).length ? (game.cheats || []).filter((c) => c.enabled).length + " attivi" : "codici Action Replay" }),
           menuButton("chart", "Diagnostica", () => openDiagnostics()),
           menuButton("download", "Esporta .sav", () => exportSav(), { hint: "salvataggio del gioco" }),
           menuButton("restart", "Riavvia gioco", async () => {
@@ -478,6 +491,78 @@ function openMenu() {
       ],
     });
   });
+}
+
+// ------------------------------------------------------------------ trucchi
+
+async function saveCheats(list) {
+  game = await store.updateGame(game.id, (g) => ({ ...g, cheats: list }));
+  return engine.setCheats(list);
+}
+
+function openCheats() {
+  const support = CHEAT_SUPPORT[engine.coreId];
+  withPause((onClose) => {
+    const sheet = openSheet({ title: "Trucchi", onClose, content: [] });
+    const render = () => sheet.setContent(cheatsContent(render, support));
+    render();
+  });
+}
+
+function cheatsContent(render, support) {
+  const list = game.cheats || [];
+  const out = [];
+  if (support === "no") out.push(h("div.tip-card", h("strong", "Questo motore non applica i trucchi"), h("p", "Con DeSmuME (recente) i codici non hanno effetto. Usa melonDS o DeSmuME 2015 (si sceglie dalla scheda del gioco).")));
+  if (support === "unverified") out.push(h("div.tip-card", h("strong", "Da verificare"), h("p", "Per Game Boy e GBA il supporto dei codici non è stato ancora verificato con un test.")));
+  out.push(h("p.muted.small", "Prima di attivare un trucco creo uno stato di sicurezza: alcuni trucchi cambiano la partita in modo permanente quando salvi dal gioco, e così puoi sempre tornare indietro. Usa codici per la tua versione esatta (" + (game.info?.gameCode || "codice gioco") + ")."));
+  if (list.length) {
+    out.push(section("I tuoi trucchi", h("ul.cheat-list", list.map((c) => h("li",
+      toggle(c.name, !!c.enabled, async (v) => {
+        if (v) {
+          try { await session.storeState(engine.saveState(), "prerestore", {}, { label: "Prima del trucco «" + c.name + "»" }); } catch (_) { /* nessuno stato */ }
+        }
+        const n = await saveCheats(list.map((x) => (x.id === c.id ? { ...x, enabled: v } : x)));
+        toast(v ? "Trucco attivo · copia di sicurezza creata" : "Trucco disattivato" + (n ? ` (${n} ancora attivi)` : ""), { kind: v ? "ok" : "info" });
+        render();
+      }, c.lines ? c.lines.length + " righe" : ""),
+      h("button.icon-btn.ghost", { "aria-label": "Elimina " + c.name, onclick: async () => {
+        if (!(await confirmDialog(`Eliminare il trucco «${c.name}»?`, { ok: "Elimina", danger: true }))) return;
+        await saveCheats(list.filter((x) => x.id !== c.id));
+        render();
+      } }, iconEl("trash")))))),
+    h("button.btn.ghost", { onclick: async () => { await saveCheats(list.map((x) => ({ ...x, enabled: false }))); toast("Trucchi disattivati"); render(); } }, "Disattiva tutti"));
+  }
+  const name = h("input.input", { placeholder: "Nome (es. Soldi al massimo)", maxlength: 60 });
+  const code = h("textarea.input", { placeholder: game.system === "nds" ? "XXXXXXXX YYYYYYYY\nXXXXXXXX YYYYYYYY" : "Codice", spellcheck: false, autocapitalize: "characters", autocomplete: "off" });
+  const err = h("p.small", { style: { color: "var(--danger)" } });
+  out.push(section("Aggiungi un codice",
+    h("label.field", h("span", "Nome"), name),
+    h("label.field", h("span", game.system === "nds" ? "Codice Action Replay" : "Codice"), code),
+    err,
+    h("div.row.wrap",
+      h("button.btn.primary", { onclick: async () => {
+        try {
+          const n = normalizeCode(code.value, game.system);
+          const item = { id: uid(), name: name.value.trim() || "Trucco " + (list.length + 1), code: n.code, lines: n.lines, enabled: false };
+          await saveCheats([...list, item]);
+          toast("Trucco aggiunto: attivalo quando vuoi", { kind: "ok" });
+          render();
+        } catch (e) {
+          err.textContent = e.message;
+        }
+      } }, iconEl("plus"), "Aggiungi"),
+      h("button.btn", { onclick: async () => {
+        const [f] = await pickFile(".cht,text/plain");
+        if (!f) return;
+        const items = parseCht(await f.text()).map((c) => {
+          try { const n = normalizeCode(c.code, game.system); return { id: uid(), name: c.name, code: n.code, lines: n.lines, enabled: false }; } catch (_) { return null; }
+        }).filter(Boolean);
+        if (!items.length) return toast("Nessun codice valido nel file", { kind: "warn" });
+        await saveCheats([...list, ...items]);
+        toast(`${items.length} trucchi importati (disattivati)`, { kind: "ok" });
+        render();
+      } }, iconEl("upload"), "Importa file .cht"))));
+  return out;
 }
 
 function volumeRow() {

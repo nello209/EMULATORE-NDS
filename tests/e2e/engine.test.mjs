@@ -84,6 +84,17 @@ for (const core of ["melonds", "desmume2015", "desmume"]) {
         return { c0, c1, ok, stillPaused: f1 === f0 };
       });
       assert.ok(p.ok && p.stillPaused && p.c1 <= p.c0 + 6, "ripristino in pausa " + JSON.stringify(p));
+      // trucchi Action Replay: scrivono in RAM (0x02100040) quello che dice il codice
+      const cheat = await page.evaluate(async () => {
+        const read = () => { const s = E.saveState(); for (let i = 0; i + 80 <= s.length; i += 4) if (s[i] === 0x56 && s[i + 1] === 0x53 && s[i + 2] === 0x56 && s[i + 3] === 0x54) { const dv = new DataView(s.buffer, i); if (dv.getUint32(4, true) < 0x1000000) return [dv.getUint32(0x40, true), dv.getUint32(0x44, true)]; } return null; };
+        const before = read();
+        // D2000000 = terminatore, valori >= 0x80000000: il caso che melonDS sbagliava
+        E.setCheats([{ code: "02100040 12345678+D2000000 00000000+02100044 9ABCDEF0", enabled: true }]);
+        await new Promise((r) => setTimeout(r, 400));
+        return { before, after: read() };
+      });
+      if (core === "desmume") assert.deepEqual(cheat.after, [0, 0], "DeSmuME recente non applica i trucchi (indicato nell'app)");
+      else assert.deepEqual(cheat.after, [0x12345678, 0x9abcdef0], "trucco su due righe applicato");
       assert.deepEqual(t.errors, []);
     } finally {
       await t.close();

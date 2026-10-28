@@ -3,6 +3,8 @@
 // Un solo core per pagina: per cambiare gioco si ricarica la pagina, cosi' la
 // memoria del core viene liberata davvero.
 
+import { encodeForCore } from "./cheats.js";
+
 export const BUTTON = Object.freeze({
   B: 0, Y: 1, SELECT: 2, START: 3, UP: 4, DOWN: 5, LEFT: 6, RIGHT: 7,
   A: 8, X: 9, L: 10, R: 11, L2: 12, R2: 13, L3: 14, R3: 15,
@@ -169,6 +171,8 @@ export class Engine extends EventTarget {
       setFFRatio: w("set_ff_ratio", "null", ["number"]),
       frameCount: w("get_current_frame_count", "number", []),
       setKeyboardEnabled: w("ejs_set_keyboard_enabled", "null", ["number"]),
+      setCheat: w("set_cheat", "null", ["number", "number", "string"]),
+      resetCheat: w("reset_cheat", "null", []),
     };
     this.canvas.addEventListener("webglcontextlost", (e) => {
       e.preventDefault();
@@ -426,6 +430,15 @@ export class Engine extends EventTarget {
     } catch (_) {
       return "";
     }
+  }
+
+  /** Applica l'elenco dei trucchi attivi ([{ code, enabled }]). */
+  setCheats(list) {
+    if (!this.started) return 0;
+    this.fn.resetCheat();
+    const on = (list || []).filter((c) => c.enabled && c.code);
+    on.forEach((c, i) => this.fn.setCheat(i, 1, encodeForCore(c.code, this.coreId)));
+    return on.length;
   }
 
   /** Misura i fotogrammi al secondo emulati in una finestra di tempo. */

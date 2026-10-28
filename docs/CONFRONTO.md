@@ -26,6 +26,7 @@ Le informazioni su Unova Pocket vengono solo dalla descrizione ricevuta: non ho 
 | Salvataggi locali | backup ogni 30 s, copie per sessione e pre-ripristino | **migliore**: autosalvataggi «con controllo di salute», miniature, `.sav` versionato, quote separate (vedi §2) ✅ |
 | Cloud | 3 punti cloud per utente/gioco, controllo versione | **assente** (scelta): trasferimento con backup `.zip` via AirDrop/iCloud/WhatsApp, senza account |
 | Blocchi | contatore fotogrammi fermo 15 s, errori Wasm/WebGL | **migliore**: anche il blocco con emulatore attivo (es. schermo nero) ✅ |
+| Trucchi | preset per Pokémon Bianco ITA (dichiarati «non ancora provati») + codici Action Replay | codici Action Replay e file `.cht`, stato di sicurezza prima di attivarli, verificati con test su melonDS/DeSmuME 2015; corretto un difetto di melonDS sui valori ≥ 0x80000000 (es. `D2000000`). **Nessun preset**: non includo codici che non posso verificare |
 | Diagnostica | — | velocità minuto per minuto, durata salvataggi, blocchi, rapporto esportabile |
 | Offline | non indicato | ✅ dopo la prima apertura |
 | Test | interfaccia, backup, conflitti cloud, import, turbo, arresti, core con ROM homebrew | 13 unitari + 21 end-to-end con i core veri + test di durata (§6) |

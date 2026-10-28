@@ -1,6 +1,7 @@
 // Palette dell'interfaccia: valgono sia per la libreria sia per lo schermo di gioco.
 export const THEMES = {
   vesuvio: { name: "Vesuvio", desc: "Notte sul golfo, lava arancione", bg: "#0f1220", surface: "#181c2e", surface2: "#22283f", text: "#f2f3f8", muted: "#9aa2c0", accent: "#ff6b2c", accent2: "#ffb547", btn: "#2a3150", btnText: "#ffffff", danger: "#ff4d6d", ok: "#3ddc97" },
+  ghiaccio: { name: "Ghiaccio", desc: "Azzurro ghiaccio su blu notte", bg: "#07101b", surface: "#0f2133", surface2: "#163049", text: "#eef8ff", muted: "#9db8cc", accent: "#6fd8ff", accent2: "#ffb070", btn: "#1b3955", btnText: "#ffffff", danger: "#ff5d73", ok: "#5be3a8", glow: ["#6fd8ff", "#2f6fff"], faces: ["#ffb070", "#e98a52", "#4aa8d8", "#4aa8d8"] },
   napoli: { name: "Napoli", desc: "Azzurro e bianco", bg: "#06213a", surface: "#0b3156", surface2: "#124271", text: "#ffffff", muted: "#a9c8e6", accent: "#12a0d7", accent2: "#ffffff", btn: "#1565a8", btnText: "#ffffff", danger: "#ff5d73", ok: "#5be3a8" },
   unova: { name: "Unima", desc: "Bianco e nero, come Pokémon Nero/Bianco", bg: "#0b0b0d", surface: "#17171b", surface2: "#232329", text: "#f5f5f5", muted: "#a3a3ad", accent: "#e8e8e8", accent2: "#7b7b86", btn: "#2b2b31", btnText: "#ffffff", danger: "#ff5a5a", ok: "#7ee0a1" },
   viola: { name: "Ametista", desc: "Viola e nero", bg: "#100a18", surface: "#1b1128", surface2: "#2a1a3e", text: "#f6efff", muted: "#b9a6d6", accent: "#a45cff", accent2: "#e06bff", btn: "#33204d", btnText: "#ffffff", danger: "#ff5b8a", ok: "#55e6a5" },
@@ -63,6 +64,8 @@ export function applyTheme(id, custom = null) {
   set("--btn-text", t.btnText);
   set("--danger", t.danger);
   set("--ok", t.ok);
+  set("--on-accent", luminance(t.accent) > 0.45 ? "#07131c" : "#ffffff");
+  set("--on-accent-2", luminance(t.accent2) > 0.45 ? "#07131c" : "#ffffff");
   const glow = t.glow || [t.accent, t.accent2];
   set("--glow-1", glow[0]);
   set("--glow-2", glow[1]);

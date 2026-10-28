@@ -3,7 +3,7 @@
 
 Non contiene codice o dati Nintendo: e' scritta da zero con un mini-assemblatore
 ARM. Comportamento:
-  - schermo superiore: colore che cambia a ogni fotogramma (rosso = frame & 31)
+  - schermo superiore: gradiente animato (rosso = x + fotogramma, verde = y)
   - tenendo premuto A: schermo superiore verde
   - tenendo premuto B: schermo superiore blu
   - premendo SELECT: il "gioco" si blocca su schermo nero (l'emulatore continua a
@@ -128,16 +128,31 @@ def arm9_program():
     a.ldr_lit(0, 0x04000130); a.memh(True, 1, 0)         # KEYINPUT (0 = premuto)
     a.tst(1, 4); a.b("hang", "eq")                       # SELECT
     a.and_(2, 4, 31)
-    a.tst(1, 1); a.ldr_lit(2, 0x03E0, cond="eq")         # A -> verde
-    a.tst(1, 2); a.ldr_lit(2, 0x7C00, cond="eq")         # B -> blu
+    a.mov(9, 0)                                          # r9 = 1 se un tasto forza un colore pieno
+    a.tst(1, 1); a.ldr_lit(2, 0x03E0, cond="eq"); a.mov(9, 1, cond="eq")   # A -> verde
+    a.tst(1, 2); a.ldr_lit(2, 0x7C00, cond="eq"); a.mov(9, 1, cond="eq")   # B -> blu
     a.ldr_lit(0, 0x02100014); a.memh(True, 1, 0)         # EXTKEYIN copiato dall'ARM7
-    a.tst(1, 1); a.ldr_lit(2, 0x03FF, cond="eq")         # X -> giallo
-    a.tst(1, 2); a.ldr_lit(2, 0x7FE0, cond="eq")         # Y -> azzurro
-    a.tst(1, 0x40); a.ldr_lit(2, 0x7FFF, cond="eq")      # penna sul touch -> bianco
+    a.tst(1, 1); a.ldr_lit(2, 0x03FF, cond="eq"); a.mov(9, 1, cond="eq")   # X -> giallo
+    a.tst(1, 2); a.ldr_lit(2, 0x7FE0, cond="eq"); a.mov(9, 1, cond="eq")   # Y -> azzurro
+    a.tst(1, 0x40); a.ldr_lit(2, 0x7FFF, cond="eq"); a.mov(9, 1, cond="eq")  # penna -> bianco
+    a.ldr_lit(0, 0x06800000)
+    a.cmp(9, 0); a.b("gradient", "eq")
     a.orr_lsl(2, 2, 2, 16)
-    a.ldr_lit(0, 0x06800000); a.ldr_lit(3, 24576)
+    a.ldr_lit(3, 24576)
     a.label("fill")
     a.mem(False, 2, 0, off=4, post=True); a.subs(3, 3, 1); a.b("fill", "ne")
+    a.b("filled")
+    # nessun tasto: gradiente animato (rosso = x + tempo, verde = y)
+    a.label("gradient")
+    a.mov(7, 0)
+    a.label("gfill")
+    a.mov_lsr(6, 7, 2); a.dp(4, 6, 6, rm=4); a.and_(6, 6, 31)
+    a.mov_lsr(8, 7, 9); a.and_(8, 8, 31); a.orr_lsl(6, 6, 8, 5)
+    a.dp(12, 6, 6, imm=0x3000)
+    a.orr_lsl(6, 6, 6, 16)
+    a.mem(False, 6, 0, off=4, post=True)
+    a.add(7, 7, 1); a.cmp(7, 0x6000); a.b("gfill", "ne")
+    a.label("filled")
     a.ldr_lit(0, 0x04000006)
     a.label("wait2")
     a.memh(True, 1, 0); a.cmp(1, 192); a.b("wait2", "eq")

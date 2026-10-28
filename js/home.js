@@ -9,7 +9,7 @@ import { h, $, toast, formatWhen, formatDuration, formatBytes, formatDate, pickF
 import { openSheet, confirmDialog, alertDialog, stateCard, emptyState, segmented, toggle, slider, section, menuButton, blobUrl, kindLabel } from "./ui.js";
 import { makeZip, isZip } from "./zip.js";
 
-export const APP_VERSION = "1.0.0";
+export const APP_VERSION = "1.1.0";
 
 let settings;
 
@@ -63,17 +63,17 @@ async function render() {
   const games = await store.listGames();
   const grid = $("#games");
   grid.innerHTML = "";
-  if (!games.length) {
-    grid.append(h("div.empty-library",
-      h("img", { src: "assets/icon.svg", alt: "", width: 96, height: 96 }),
-      h("h3", "Nessun gioco, per ora"),
-      h("p", "Aggiungi la tua copia di un gioco (.nds, .gba, .gbc, .gb o .zip). Il file resta solo su questo dispositivo: non viene caricato da nessuna parte."),
-      h("button.btn.primary.big", { onclick: addGames }, iconEl("plus"), "Aggiungi gioco")));
-  }
+  if (!games.length) grid.append(emptyState("Qui compariranno i tuoi giochi, con la loro icona originale.", "library"));
   for (const g of games) grid.append(gameCard(g));
   await renderContinue(games);
+  renderFeatures();
   await renderFoot();
 }
+
+const DS_ART = `<svg class="ds-art" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <rect x="20" y="8" width="56" height="38" rx="9"/><rect x="29" y="16" width="38" height="22" rx="4" fill="currentColor" fill-opacity=".85" stroke="none"/>
+  <rect x="16" y="50" width="64" height="38" rx="10"/><rect x="36" y="58" width="24" height="22" rx="4"/>
+  <path d="M25 69h8M29 65v8"/><circle cx="68" cy="66" r="2" fill="currentColor"/><circle cx="72" cy="72" r="2" fill="currentColor"/></svg>`;
 
 function gameCard(g) {
   const sys = SYSTEMS[g.system];
@@ -91,20 +91,47 @@ function gameCard(g) {
 async function renderContinue(games) {
   const sec = $("#continue");
   sec.innerHTML = "";
-  const g = games.find((x) => x.lastPlayedAt);
-  if (!g) { sec.hidden = true; return; }
+  const g = games.find((x) => x.lastPlayedAt) || games[0];
+  const screen = h("div.console-screen");
+  if (!g) {
+    screen.innerHTML = DS_ART;
+    screen.append(
+      h("p.eyebrow", "La prossima avventura ti aspetta"),
+      h("h3", "Pronto a partire?"),
+      h("p", "Aggiungi la tua copia di un gioco (.nds, .gba, .gbc, .gb o .zip). Il file resta solo su questo dispositivo."),
+      h("button.btn.primary.big", { onclick: addGames }, iconEl("plus"), "Aggiungi gioco"));
+    sec.append(h("div.console-top", h("strong", "Nessun gioco caricato"), h("span.led")), screen,
+      h("div.console-strip", h("span", "Dual screen · touch"), h("span", "Offline pronto")));
+    return;
+  }
   const best = await store.bestContinueState(g.id, g.core || SYSTEMS[g.system].cores[0]);
-  sec.hidden = false;
-  sec.className = "continue-card";
+  const shotImg = best?.thumb ? h("img", { src: blobUrl(best.thumb), alt: "Ultima schermata" }) : g.icon ? h("img", { src: blobUrl(g.icon), alt: "" }) : null;
+  screen.append(
+    h("div.shot" + (g.system === "nds" ? "" : ".gba"), shotImg),
+    h("p.eyebrow", g.lastPlayedAt ? "Riprendi l'avventura" : "Pronto a giocare"),
+    h("h3", g.title),
+    h("p", best ? `${kindLabel(best)} · ${formatWhen(best.createdAt)}` : "Si parte dal salvataggio del gioco"),
+    h("div.console-actions",
+      h("a.btn.primary.big", { href: playUrl(g.id) }, iconEl("play"), best ? "Continua" : "Gioca"),
+      h("button.btn", { onclick: () => openGame(g.id) }, iconEl("load"), "Salvataggi")));
   sec.append(
-    h("div.continue-thumb", best?.thumb ? h("img", { src: blobUrl(best.thumb), alt: "" }) : (g.icon ? h("img.pixel", { src: blobUrl(g.icon), alt: "" }) : null)),
-    h("div.continue-text",
-      h("p.eyebrow", "Continua"),
-      h("h2", g.title),
-      h("p.muted", best ? `${kindLabel(best)} · ${formatWhen(best.createdAt)}${best.playSec ? " · " + formatDuration(best.playSec) + " di gioco" : ""}` : "Riparte dal salvataggio del gioco"),
-      h("div.row",
-        h("a.btn.primary.big", { href: playUrl(g.id) }, iconEl("play"), "Continua"),
-        h("button.btn.ghost", { onclick: () => openGame(g.id) }, "Altri salvataggi"))));
+    h("div.console-top", h("strong", g.title), h("span.led")),
+    screen,
+    h("div.console-strip",
+      h("span", best ? "Ultimo stato · " + formatWhen(best.createdAt) : SYSTEMS[g.system].label),
+      h("span", g.playSec ? "⏱ " + formatDuration(g.playSec) : "Nuova partita")));
+}
+
+function renderFeatures() {
+  const f = $("#features");
+  if (f.childElementCount) return;
+  const items = [
+    ["shield", "Salvataggi a prova di errore", "Stati con miniatura solo mentre giochi, ogni versione del salvataggio del gioco conservata, copia di sicurezza prima di ogni ripristino."],
+    ["warning", "Blocchi sotto controllo", "Se il gioco si pianta, anche con lo schermo nero, Vesuvio se ne accorge e protegge gli stati buoni."],
+    ["turbo", "Turbo onesto", "Fino a ×6 o al massimo del dispositivo, con la velocità reale sempre visibile."],
+    ["share", "La partita passa di mano", "Backup in un file: AirDrop, iCloud o WhatsApp. Nessun account, nessun accesso che scade."],
+  ];
+  for (const [ic, t, d] of items) f.append(h("div.card.feature", iconEl(ic), h("h3", t), h("p", d)));
 }
 
 async function renderFoot() {

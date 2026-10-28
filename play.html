@@ -20,16 +20,16 @@
   <header class="game-bar" id="bar">
     <button class="icon-btn" id="btn-menu" aria-label="Menu"></button>
     <div class="game-title" id="title"></div>
-    <div class="speed-chip" id="speed" hidden></div>
-    <button class="icon-btn" id="btn-full" aria-label="Schermo intero"></button>
-    <button class="icon-btn" id="btn-view" aria-label="Schermi"></button>
+    <button class="icon-btn" id="btn-pause" aria-label="Pausa"></button>
     <button class="icon-btn turbo-btn" id="btn-turbo" aria-label="Turbo"><span class="turbo-x"></span></button>
     <button class="icon-btn" id="btn-save" aria-label="Salva ora"></button>
-    <button class="icon-btn" id="btn-pause" aria-label="Pausa"></button>
+    <button class="icon-btn" id="btn-view" aria-label="Schermi"></button>
+    <button class="icon-btn" id="btn-full" aria-label="Schermo intero"></button>
   </header>
   <main class="stage" id="stage">
-    <div class="screens" id="screens"><canvas id="canvas" tabindex="-1"></canvas></div>
+    <div class="bezel" id="bezel"><div class="screens" id="screens"><canvas id="canvas" tabindex="-1"></canvas></div></div>
   </main>
+  <div class="status-strip" id="strip"><span class="strip-label"><i class="led"></i><span id="strip-label"></span></span><span class="speed-chip" id="speed">×1.00</span></div>
   <div id="pad"></div>
   <div class="freeze-banner" id="freeze" hidden></div>
   <div class="overlay" id="overlay">

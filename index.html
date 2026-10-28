@@ -19,8 +19,8 @@
 <body class="home-page">
 <header class="app-header">
   <div class="brand">
-    <img src="assets/icon.svg" alt="" class="brand-logo" width="40" height="40">
-    <div><h1>Vesuvio</h1><p class="tagline">DS · GBA · Game Boy, ovunque</p></div>
+    <img src="assets/icon.svg" alt="" class="brand-logo" width="42" height="42">
+    <div><h1>vesuvio <span>pocket</span></h1></div>
   </div>
   <nav class="header-actions">
     <button class="icon-btn" id="btn-guide" aria-label="Guida"></button>
@@ -28,8 +28,13 @@
   </nav>
 </header>
 <main class="home" id="home">
+  <section class="hero">
+    <p class="eyebrow">DS · GBA · Game Boy</p>
+    <h2>La tua partita,<br><span class="grad">sempre con te.</span></h2>
+    <p>Riparti esattamente da dove eri rimasto, su telefono, iPad o PC.</p>
+  </section>
   <div id="install-hint" hidden></div>
-  <section id="continue" hidden></section>
+  <section id="continue" class="console-card"></section>
   <section class="library">
     <div class="section-head">
       <h2>La tua libreria</h2>
@@ -37,6 +42,7 @@
     </div>
     <div class="game-grid" id="games"></div>
   </section>
+  <section class="features" id="features"></section>
   <footer class="home-foot" id="foot"></footer>
 </main>
 <div class="drop-zone" id="drop" hidden><p>Rilascia qui la ROM o il backup</p></div>
