@@ -132,7 +132,15 @@ async function boot() {
   hideOverlay();
   updateBar();
   if (startState && fromState && session.loadedFromState) toast("Ripreso da: " + kindLabel(startState) + " · " + formatWhen(startState.createdAt));
-  else if (fromState) toast("Lo stato scelto non è stato applicato dal motore: il gioco parte dal suo salvataggio interno.", { kind: "warn", ms: 7000 });
+  else if (fromState) {
+    // Lo stato non e' stato accettato: fermiamo tutto prima che il giocatore inizi
+    // per sbaglio una nuova partita e la salvi sopra a quella vecchia.
+    togglePause(true);
+    fatal("Questo stato non si è caricato",
+      "Il motore non ha accettato lo stato scelto, quindi il gioco partirebbe " + (savData ? "dal salvataggio del gioco." : "dall'inizio.") +
+      " Non iniziare una nuova partita e non salvare: se lo stato viene da un altro emulatore, esporta da lì il file .sav e importalo nella scheda del gioco.",
+      [h("button.btn", { onclick: () => { hideOverlay(); togglePause(false); } }, "Gioca comunque")]);
+  }
   showTipsOnce();
   window.vesuvio.ready = true;
 }

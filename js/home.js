@@ -9,7 +9,7 @@ import { h, $, toast, formatWhen, formatDuration, formatBytes, formatDate, pickF
 import { openSheet, confirmDialog, alertDialog, stateCard, emptyState, segmented, toggle, slider, section, menuButton, blobUrl, kindLabel } from "./ui.js";
 import { makeZip, isZip } from "./zip.js";
 
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "1.1.1";
 
 let settings;
 
@@ -104,7 +104,13 @@ async function renderContinue(games) {
       h("div.console-strip", h("span", "Dual screen · touch"), h("span", "Offline pronto")));
     return;
   }
-  const best = await store.bestContinueState(g.id, g.core || SYSTEMS[g.system].cores[0]);
+  const core = g.core || SYSTEMS[g.system].cores[0];
+  let best = await store.bestContinueState(g.id, core);
+  let startId = "best";
+  if (!best) {
+    best = (await store.listStates(g.id)).find((s) => s.kind === "import" && s.coreId === core) || null;
+    if (best) startId = best.id;
+  }
   const shotImg = best?.thumb ? h("img", { src: blobUrl(best.thumb), alt: "Ultima schermata" }) : g.icon ? h("img", { src: blobUrl(g.icon), alt: "" }) : null;
   screen.append(
     h("div.shot" + (g.system === "nds" ? "" : ".gba"), shotImg),
@@ -112,7 +118,7 @@ async function renderContinue(games) {
     h("h3", g.title),
     h("p", best ? `${kindLabel(best)} · ${formatWhen(best.createdAt)}` : "Si parte dal salvataggio del gioco"),
     h("div.console-actions",
-      h("a.btn.primary.big", { href: playUrl(g.id) }, iconEl("play"), best ? "Continua" : "Gioca"),
+      h("a.btn.primary.big", { href: playUrl(g.id, startId, startId === "best" ? null : core) }, iconEl("play"), best ? "Continua" : "Gioca"),
       h("button.btn", { onclick: () => openGame(g.id) }, iconEl("load"), "Salvataggi")));
   sec.append(
     h("div.console-top", h("strong", g.title), h("span.led")),
@@ -230,9 +236,15 @@ async function gameSheetContent(id, refresh, sheet) {
       info.pokemon ? h("p.ok-text", iconEl("check"), " Riconosciuto: ", g.title) : (info.titles?.it || info.titles?.en ? h("p.small", (info.titles.it || info.titles.en).replace(/\n/g, " · ")) : null),
       h("p.muted.small", `${formatBytes(g.size)} · SHA-1 ${g.id.slice(0, 12)}… · ${g.playSec ? formatDuration(g.playSec) + " di gioco" : "mai giocato"}`)));
 
-  const play = h("div.row.wrap",
-    h("a.btn.primary.big", { href: playUrl(id, "best") }, iconEl("play"), best ? "Continua" : "Gioca"),
-    best ? h("a.btn", { href: playUrl(id, "none") }, iconEl("file"), "Avvia dal salvataggio del gioco") : null);
+  // Nessuno stato "proprio" ma uno importato (es. da un altro emulatore): e' quello da proporre.
+  const imported = !best ? states.find((s) => s.kind === "import" && s.coreId === coreId) : null;
+  const play = imported
+    ? h("div.row.wrap",
+      h("a.btn.primary.big", { href: playUrl(id, imported.id, coreId) }, iconEl("play"), "Gioca dallo stato importato"),
+      h("a.btn", { href: playUrl(id, "none") }, iconEl("file"), saves.length ? "Avvia dal salvataggio del gioco" : "Nuova partita"))
+    : h("div.row.wrap",
+      h("a.btn.primary.big", { href: playUrl(id, "best") }, iconEl("play"), best ? "Continua" : "Gioca"),
+      best ? h("a.btn", { href: playUrl(id, "none") }, iconEl("file"), "Avvia dal salvataggio del gioco") : null);
 
   const content = [head, play];
   if (best) {
@@ -318,8 +330,9 @@ async function importForGame(g, coreId, refresh) {
       const target = coreId;
       const ok = await confirmDialog(`Importare «${f.name}» come stato per il motore ${CORES[target].label}? Funziona solo se è stato creato con lo stesso motore (gli stati di EmulatorJS 4.2.3 usano la stessa build).`, { ok: "Importa" });
       if (!ok) return;
-      await store.addState(u8, { romId: g.id, kind: "import", coreId: target, label: f.name, thumb: null, health: { suspect: false, imported: true } }, { prune: false });
-      toast("Stato importato: lo trovi tra gli «Importati»", { kind: "ok" });
+      const rec = await store.addState(u8, { romId: g.id, kind: "import", coreId: target, label: f.name, thumb: null, health: { suspect: false, imported: true } }, { prune: false });
+      const go = await confirmDialog("Stato importato. Vuoi giocare subito partendo da questo stato?", { ok: "Gioca ora", cancel: "Più tardi", title: "Stato importato" });
+      if (go) { location.href = playUrl(g.id, rec.id, target); return; }
     } else if (["sav", "dsv", "srm"].includes(ext)) {
       const core = g.system === "nds" ? (ext === "dsv" ? "desmume2015" : "melonds") : "mgba";
       await store.addSaveVersion(g.id, u8, { kind: "import", coreId: core, note: "da " + f.name });

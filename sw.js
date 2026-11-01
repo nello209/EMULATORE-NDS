@@ -1,7 +1,7 @@
 // Service worker di Vesuvio: l'app funziona anche offline.
 // - interfaccia: rete prima (aggiornamenti immediati), cache se offline;
 // - motori (file grandi): cache prima, scaricati una volta sola.
-const VERSION = "1.1.0";
+const VERSION = "1.1.1";
 const SHELL = "vesuvio-shell-" + VERSION;
 const CORES = "vesuvio-cores-ejs-4.2.3";
 
