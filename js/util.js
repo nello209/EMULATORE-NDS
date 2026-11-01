@@ -59,6 +59,40 @@ async function streamThrough(data, stream) {
 
 export const canCompress = typeof CompressionStream === "function";
 
+let packWorker = null;
+let packSeq = 0;
+const packWaiting = new Map();
+
+/**
+ * Checksum + compressione gzip in un worker (fuori dal thread del gioco).
+ * Al worker va una copia: i dati originali restano intatti anche se il worker fallisce.
+ * Restituisce { checksum, out, enc } oppure null se i worker non sono disponibili.
+ */
+export function packInWorker(data) {
+  if (typeof Worker !== "function") return Promise.resolve(null);
+  try {
+    if (!packWorker) {
+      packWorker = new Worker(new URL("./pack-worker.js", import.meta.url));
+      packWorker.onmessage = (ev) => {
+        const w = packWaiting.get(ev.data.id);
+        if (!w) return;
+        packWaiting.delete(ev.data.id);
+        if (ev.data.error) w.reject(new Error(ev.data.error));
+        else w.resolve(ev.data);
+      };
+      packWorker.onerror = () => { for (const w of packWaiting.values()) w.resolve(null); packWaiting.clear(); packWorker = null; };
+    }
+    const id = ++packSeq;
+    return new Promise((resolve, reject) => {
+      packWaiting.set(id, { resolve, reject });
+      const copy = data.slice();
+      packWorker.postMessage({ id, data: copy }, [copy.buffer]);
+    });
+  } catch (_) {
+    return Promise.resolve(null);
+  }
+}
+
 export async function gzip(data) {
   return streamThrough(data, new CompressionStream("gzip"));
 }

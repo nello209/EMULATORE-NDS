@@ -9,7 +9,7 @@ import { h, $, toast, formatWhen, formatDuration, formatBytes, formatDate, pickF
 import { openSheet, confirmDialog, alertDialog, stateCard, emptyState, segmented, toggle, slider, section, menuButton, blobUrl, kindLabel } from "./ui.js";
 import { makeZip, isZip } from "./zip.js";
 
-export const APP_VERSION = "1.1.1";
+export const APP_VERSION = "1.2.0";
 
 let settings;
 

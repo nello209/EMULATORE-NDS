@@ -9,7 +9,7 @@
 //  - i .sav sono versionati: una nuova versione si aggiunge, non sostituisce.
 
 import { tx, get, getAll, getAllByIndex, put, request } from "./db.js";
-import { uid, sha1Hex, fnv1a, gzip, gunzip, canCompress } from "./util.js";
+import { uid, sha1Hex, fnv1a, gzip, gunzip, canCompress, packInWorker } from "./util.js";
 import { analyzeRom, extractRomFromZip } from "./rominfo.js";
 import { isZip, makeZip, readZip } from "./zip.js";
 import { settingsSync } from "./settings.js";
@@ -108,15 +108,26 @@ export async function deleteGame(id) {
 export async function addState(data, meta, { prune = true } = {}) {
   const t0 = performance.now();
   const id = meta.id || uid();
+  const size = data.length;
   let stored = data;
   let enc = "raw";
-  if (canCompress && meta.compress !== false) {
-    try {
-      stored = await gzip(data);
-      enc = "gzip";
-    } catch (_) {
-      stored = data;
-      enc = "raw";
+  let checksum = null;
+  // di norma checksum e compressione avvengono in un worker, senza fermare il gioco
+  const packed = meta.compress !== false ? await packInWorker(data).catch(() => null) : null;
+  if (packed) {
+    stored = packed.out;
+    enc = packed.enc;
+    checksum = packed.checksum;
+  } else {
+    checksum = fnv1a(data);
+    if (canCompress && meta.compress !== false) {
+      try {
+        stored = await gzip(data);
+        enc = "gzip";
+      } catch (_) {
+        stored = data;
+        enc = "raw";
+      }
     }
   }
   const { compress, ...rest } = meta;
@@ -127,10 +138,10 @@ export async function addState(data, meta, { prune = true } = {}) {
     ...rest,
     id,
     createdAt: meta.createdAt || Date.now(),
-    size: data.length,
+    size,
     storedSize: stored.length,
     enc,
-    checksum: fnv1a(data),
+    checksum,
   };
   await tx(["states", "stateData"], "readwrite", (os) => {
     os.states.put(record);

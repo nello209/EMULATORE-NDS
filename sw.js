@@ -1,14 +1,14 @@
 // Service worker di Vesuvio: l'app funziona anche offline.
 // - interfaccia: rete prima (aggiornamenti immediati), cache se offline;
 // - motori (file grandi): cache prima, scaricati una volta sola.
-const VERSION = "1.1.1";
+const VERSION = "1.2.0";
 const SHELL = "vesuvio-shell-" + VERSION;
 const CORES = "vesuvio-cores-ejs-4.2.3";
 
 const SHELL_FILES = [
   "./", "index.html", "play.html", "manifest.webmanifest", "css/app.css",
   "js/home.js", "js/play.js", "js/engine.js", "js/session.js", "js/store.js", "js/db.js", "js/util.js",
-  "js/rominfo.js", "js/zip.js", "js/cheats.js", "js/settings.js", "js/themes.js", "js/controls.js", "js/icons.js", "js/ui.js",
+  "js/rominfo.js", "js/zip.js", "js/cheats.js", "js/pack-worker.js", "js/settings.js", "js/themes.js", "js/controls.js", "js/icons.js", "js/ui.js",
   "assets/icon.svg", "assets/fonts/plus-jakarta-sans-latin-wght-normal.woff2", "assets/fonts/plus-jakarta-sans-latin-ext-wght-normal.woff2", "assets/icon-180.png", "assets/icon-192.png", "assets/icon-512.png", "assets/icon-maskable-512.png",
 ];
 

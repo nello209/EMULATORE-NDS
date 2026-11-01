@@ -400,6 +400,11 @@ function wireSession() {
     sp.classList.toggle("slow", !d.turbo && r < 0.9);
     sp.classList.toggle("turbo", d.turbo);
   });
+  session.addEventListener("refresh", (e) => {
+    if (e.detail.hz && e.detail.hz < 45) {
+      toast(`Lo schermo aggiorna solo ${e.detail.hz} volte al secondo: probabilmente è attivo il Risparmio energetico, che dimezza la fluidità. Disattivalo per giocare a 60.`, { kind: "warn", ms: 9000 });
+    }
+  });
   session.addEventListener("freeze", (e) => showFreeze(e.detail));
   session.addEventListener("freeze-cleared", () => { freezeEl.hidden = true; });
   session.addEventListener("sav", () => toast("Salvataggio del gioco registrato", { kind: "ok" }));
@@ -723,6 +728,8 @@ async function openDiagnostics() {
   const rows = [
     ["Motore", CORES[engine.coreId].label + (engine.coreVersion ? " " + engine.coreVersion : "")],
     ["Velocità attuale", "×" + session.speed.ratio.toFixed(2) + (engine.fastForward ? " (turbo " + turboLabel(engine.ffRatio) + ")" : "")],
+    ["Frequenza dello schermo", session.frameMon?.hz ? session.frameMon.hz + " Hz" + (session.frameMon.hz < 45 ? " (Risparmio energetico?)" : "") : "misura in corso"],
+    ["Scatti nell'ultimo minuto", session.frameMon ? `${session.frameMon.jank50} oltre 50 ms · peggiore ${Math.round(session.frameMon.worst)} ms` : "—"],
     ["Tempo di gioco in questa sessione", formatDuration(session.runSec)],
     ["Fotogrammi emulati", engine.frame.toLocaleString("it-IT")],
     ["Salvataggi automatici", session.frozen ? "sospesi (blocco: " + session.frozen.type + ")" : "attivi ogni " + settings.autosave.intervalSec + " s"],

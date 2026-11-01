@@ -78,8 +78,9 @@ export class Session extends EventTarget {
     this.lastFrame = e.frame;
     this.lastCheckpointAt = Date.now();
     this.timers.push(setInterval(() => this.tick(), 1000));
-    this.timers.push(setInterval(() => this.watchScreen(), 5000));
-    this.timers.push(setInterval(() => this.checkSave(), 10000));
+    this.timers.push(setInterval(() => this.watchScreen(), 8000));
+    this.timers.push(setInterval(() => this.checkSave(), 15000));
+    this.startFrameMonitor();
     document.addEventListener("visibilitychange", () => this.onVisibility());
     window.addEventListener("pagehide", () => this.onVisibility());
     window.addEventListener("error", (ev) => {
@@ -105,6 +106,39 @@ export class Session extends EventTarget {
     this.lastFrameChangeAt = performance.now();
     this.lastScreenChangeAt = performance.now();
     this.inputsSinceScreenChange = 0;
+  }
+
+  /**
+   * Misura il ritmo reale dei fotogrammi del browser: frequenza dello schermo
+   * (60/120 Hz, oppure 30 Hz col Risparmio energetico) e "scatti" (fotogrammi
+   * che arrivano in ritardo). Costa pochissimo: una lettura dell'orologio a fotogramma.
+   */
+  startFrameMonitor() {
+    this.frameMon = { last: 0, gaps: [], hz: 0, jank50: 0, jank100: 0, worst: 0, samples: [] };
+    const m = this.frameMon;
+    const loop = (ts) => {
+      if (this.ended) return;
+      const active = this.engine.running && this.visible;
+      if (m.last && active) {
+        const g = ts - m.last;
+        if (m.samples.length < 120) {
+          m.samples.push(g);
+          if (m.samples.length === 120) {
+            const sorted = [...m.samples].sort((a, b) => a - b);
+            m.hz = Math.round(1000 / sorted[60]);
+            this.emit("refresh", { hz: m.hz });
+            store.logEvent(this.game.id, "refresh-rate", { session: this.id, hz: m.hz });
+          }
+        }
+        // con lo schermo a 60/120 Hz un fotogramma dura 8-17 ms: oltre 50 ms si vede uno scatto
+        if (g > 50) m.jank50++;
+        if (g > 100) m.jank100++;
+        if (g > m.worst) m.worst = g;
+      }
+      m.last = active ? ts : 0;
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
   }
 
   noteInput() {
@@ -145,6 +179,12 @@ export class Session extends EventTarget {
   flushMinute() {
     const m = this.minuteStats;
     const info = { session: this.id, runMin: Math.round(this.runSec / 60), avgRatio: +(m.frames / m.sec / this.nativeFps).toFixed(3), minRatio: +m.minRatio.toFixed(3), turbo: this.engine.fastForward };
+    if (this.frameMon) {
+      const fm = this.frameMon;
+      Object.assign(info, { hz: fm.hz, jank50: fm.jank50, jank100: fm.jank100, worstMs: Math.round(fm.worst) });
+      fm.jank50 = fm.jank100 = fm.worst = 0;
+    }
+    if (this.jobMs) { info.jobs = this.jobMs; this.jobMs = null; }
     if (performance.memory) info.heapMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
     store.logEvent(this.game.id, "perf", info);
     this.emit("perf", info);
@@ -154,11 +194,16 @@ export class Session extends EventTarget {
   /** Il gioco gira ma l'immagine non cambia da molto, nonostante i comandi: blocco "morbido". */
   async watchScreen() {
     const e = this.engine;
-    if (!e.running || !this.visible || this.frozen || this.busy) return;
+    if (!e.running || !this.visible || this.frozen || this.busy || e.fastForward) return;
+    // serve solo a capire se il gioco ignora i comandi: senza comandi non c'e' niente da controllare
+    if (this.lastScreenHash !== null && this.inputsSinceScreenChange === 0) return;
+    const t0 = performance.now();
     const png = await e.screenshot(1500);
     if (!png) return;
     const hsh = fnv1a(png);
+    this.noteJob("screen", performance.now() - t0);
     this.lastThumb = png;
+    this.lastThumbAt = performance.now();
     const now = performance.now();
     if (hsh !== this.lastScreenHash) {
       this.lastScreenHash = hsh;
@@ -201,8 +246,16 @@ export class Session extends EventTarget {
     this.emit("freeze-cleared");
   }
 
+  noteJob(name, ms) {
+    this.jobMs = this.jobMs || {};
+    this.jobMs[name] = Math.max(this.jobMs[name] || 0, Math.round(ms));
+  }
+
   async thumbnail() {
+    // riusa l'ultima cattura se recente: una cattura in meno durante il salvataggio
+    if (this.lastThumb && performance.now() - (this.lastThumbAt || 0) < 10000) return new Blob([this.lastThumb], { type: "image/png" });
     const png = (await this.engine.screenshot(1500)) || this.lastThumb;
+    if (png) { this.lastThumb = png; this.lastThumbAt = performance.now(); }
     return png ? new Blob([png], { type: "image/png" }) : null;
   }
 
@@ -240,7 +293,9 @@ export class Session extends EventTarget {
     try {
       const t0 = performance.now();
       const thumb = await this.thumbnail();
+      const ts = performance.now();
       const data = e.saveState();
+      this.noteJob("saveState", performance.now() - ts);
       const tState = performance.now() - t0;
       const checkpoint = Date.now() - this.lastCheckpointAt >= this.settings.autosave.checkpointEveryMin * 60000;
       const rec = await this.storeState(data, checkpoint ? "checkpoint" : "auto", {}, { thumb });
@@ -362,6 +417,7 @@ export class Session extends EventTarget {
     this.flushMinute();
     store.logEvent(this.game.id, "session-end", { session: this.id, runSec: this.runSec });
     for (const t of this.timers) clearInterval(t);
+    this.ended = true;
   }
 
   /** Misura quanto puo' accelerare il dispositivo (turbo illimitato per qualche secondo). */
